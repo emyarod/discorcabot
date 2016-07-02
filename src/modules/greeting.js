@@ -1,3 +1,5 @@
 export function greeting(orcabot, message) {
-  orcabot.reply(message, '(⊙ ◡ ⊙)');
+  if (message.content.indexOf('hi') > -1) {
+    orcabot.reply(message, '(⊙ ◡ ⊙)');
+  }
 }
