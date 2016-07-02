@@ -57,12 +57,13 @@ export function getArtistInfo(orcabot, message) {
       orcabot.reply(message, `**${artist}** is not a valid artist on Last.fm!`);
       console.warn(`LAST.FM .getinfo -- ${err.message}`);
       console.warn(err);
-    } else {
-      // strip html, strip whitespace, decode entities, trim
-      let reply = entities.decode(artist.bio.summary);
-      reply = reply.replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim();
-      orcabot.reply(message, reply);
+      return;
     }
+
+    // strip html, strip whitespace, decode entities, trim
+    let reply = entities.decode(artist.bio.summary);
+    reply = reply.replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim();
+    orcabot.reply(message, reply);
   });
 }
 
