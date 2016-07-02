@@ -33,4 +33,5 @@ node_modules
 .node_repl_history
 
 discorcabot.js
+src/cfg/lastfmdb.json
 src/cfg/opendoors.js
