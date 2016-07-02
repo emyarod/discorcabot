@@ -31,3 +31,8 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+discorcabot.js
+src/cfg/config.js
+src/cfg/opendoors.js
+src/cfg/lastfmdb.json
