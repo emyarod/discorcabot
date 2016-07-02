@@ -63,7 +63,26 @@ export function getArtistInfo(orcabot, message) {
     // strip html, strip whitespace, decode entities, trim
     let reply = entities.decode(artist.bio.summary);
     reply = reply.replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim();
-    orcabot.reply(message, reply);
+
+    // slice largest image from array of returned images
+    let {
+      image: image
+    } = artist;
+
+    [{
+      '#text': image
+    }] = image.slice(-3, -2);
+
+    // attach image if Last.fm returns an image
+    if (image !== '') {
+      orcabot.sendFile(message, image, null, reply, (error, message) => {
+        if (error) {
+          console.warn(`LAST.FM .getinfo sendFile -- ${error}`);
+        }
+      });
+    } else {
+      orcabot.reply(message, reply);
+    }
   });
 }
 
@@ -206,7 +225,7 @@ export function nowplaying(orcabot, message) {
       if (image !== '') {
         orcabot.sendFile(message, image, null, content, (error, message) => {
           if (error) {
-            console.warn(`LAST.FM sendFile -- ${error}`);
+            console.warn(`LAST.FM .np sendFile -- ${error}`);
           }
         });
       } else {
