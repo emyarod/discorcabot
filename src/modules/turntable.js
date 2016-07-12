@@ -69,7 +69,6 @@ function player(orcabot) {
 
 // request and load SoundCloud tracks or playlists
 function soundcloud(orcabot, message, songURL, arg) {
-  // TODO: possibly implement promise
   // SoundCloud loader
   function scLoader(orcabot, message, track) {
     const artist = track.user.username;
@@ -78,6 +77,16 @@ function soundcloud(orcabot, message, songURL, arg) {
 
     // add track details to current queue
     loader(message, 'SoundCloud', streamURL, title, artist);
+  }
+
+  function singleTrackLoader(orcabot, message, track) {
+    // load track into queue
+    scLoader(orcabot, message, track);
+
+    // announce queue additions
+    const artist = track.user.username;
+    const title = track.title;
+    orcabot.reply(message, `Added \`${title}\` by \`${artist}\` to the queue!`);
   }
 
   if (arg === 'link') {
@@ -91,13 +100,7 @@ function soundcloud(orcabot, message, songURL, arg) {
 
         // SoundCloud playlist/track handling
         if (kind === 'track') {
-          // load track into queue
-          scLoader(orcabot, message, track);
-
-          // announce queue additions
-          const artist = track.user.username;
-          const title = track.title;
-          orcabot.reply(message, `Added \`${title}\` by \`${artist}\` to the queue!`);
+          singleTrackLoader(orcabot, message, track);
         } else if (kind === 'playlist') {
           // load each track from playlist into queue
           for (let i = 0; i < track.tracks.length; i++) {
@@ -126,14 +129,7 @@ function soundcloud(orcabot, message, songURL, arg) {
     request(requestURL, (error, response, body) => {
       if (!error && response.statusCode == 200) {
         const [track] = JSON.parse(body);
-
-        // load track into queue
-        scLoader(orcabot, message, track);
-
-        // announce queue additions
-        const artist = track.user.username;
-        const title = track.title;
-        orcabot.reply(message, `Added \`${title}\` by \`${artist}\` to the queue!`);
+        singleTrackLoader(orcabot, message, track);
 
         // play top track from queue to voice channel
         player(orcabot);
@@ -367,13 +363,14 @@ export function turntable(orcabot, message) {
 
         // TODO: Spotify
       } else {
-        // play attachment OR first search result
         console.log('not a valid URL');
+
+        // play attachment OR first search result
         let searchTerm = songURL;
         if (!searchTerm.length) {
           // TODO: play attached file if no search term
           console.log('no search term');
-          // check if attachment exists
+          // TODO: check if attachment exists
         } else {
           // search YouTube (or other site if specified)
           if (!searchTerm.search(/^(sc:)/)) {
