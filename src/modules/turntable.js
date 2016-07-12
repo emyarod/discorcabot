@@ -11,7 +11,7 @@ function radio() {}
 let queue = [];
 
 // add track details to current queue
-function loader(message, platform, streamURL, title, artist = null) {
+function loader(message, streamURL, title, artist = null, platform = null) {
   queue.push({
     'artist': artist,
     'title': title,
@@ -76,9 +76,10 @@ function soundcloud(orcabot, message, songURL, arg) {
     const streamURL = `${track.stream_url}?client_id=${keys.scClientID}`;
 
     // add track details to current queue
-    loader(message, 'SoundCloud', streamURL, title, artist);
+    loader(message, streamURL, title, artist, 'SoundCloud');
   }
 
+  // TODO: possible cleanup
   function singleTrackLoader(orcabot, message, track) {
     // load track into queue
     scLoader(orcabot, message, track);
@@ -150,7 +151,7 @@ function ytdl(orcabot, message, songURL, platform = null) {
     const streamURL = track.url;
 
     // add track details to current queue
-    loader(message, 'ytdl', streamURL, title);
+    loader(message, streamURL, title, 'ytdl');
   }
 
   // set options based on service platform
@@ -368,9 +369,18 @@ export function turntable(orcabot, message) {
         // play attachment OR first search result
         let searchTerm = songURL;
         if (!searchTerm.length) {
-          // TODO: play attached file if no search term
-          console.log('no search term');
-          // TODO: check if attachment exists
+          // play attached file if no search term
+          if (message.attachments.length > 0) {
+            // check if attachment exists
+            for (var i = 0; i < message.attachments.length; i++) {
+              var element = message.attachments[i];
+              // begin playback from start of queue
+              loader(message, element.url, element.filename);
+            }
+
+            // play top track from queue to voice channel
+            player(orcabot);
+          }
         } else {
           // search YouTube (or other site if specified)
           if (!searchTerm.search(/^(sc:)/)) {
