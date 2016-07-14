@@ -43,7 +43,7 @@ function player(orcabot) {
 
       // announce currently playing track
       switch (track.platform) {
-        case 'SoundCloud':
+        case 'soundcloud':
           // SoundCloud
           orcabot.reply(track.message, `Now playing: \`${track.title}\` by \`${track.artist}\``);
           break;
@@ -76,7 +76,7 @@ function soundcloud(orcabot, message, songURL, arg) {
     const streamURL = `${track.stream_url}?client_id=${keys.scClientID}`;
 
     // add track details to current queue
-    loader(message, streamURL, title, artist, 'SoundCloud');
+    loader(message, streamURL, title, artist, 'soundcloud');
   }
 
   // TODO: possible cleanup
@@ -123,6 +123,7 @@ function soundcloud(orcabot, message, songURL, arg) {
       }
     });
   } else if (arg === 'search') {
+    // fetch top SoundCloud search result
     const searchTerm = songURL;
     const requestURL = `http://api.soundcloud.com/tracks.json?q=${searchTerm}&client_id=${keys.scClientID}`;
 
@@ -156,7 +157,7 @@ function ytdl(orcabot, message, songURL, platform = null) {
 
   // set options based on service platform
   let options = null;
-  if (platform === 'YouTube') {
+  if (platform === 'youtube') {
     options = ['-f bestaudio'];
   }
 
@@ -195,8 +196,8 @@ function ytdl(orcabot, message, songURL, platform = null) {
   });
 }
 
-// YouTube search
-function ytSearch(orcabot, message, searchTerm) {
+// fetch top YouTube search result
+function ytImFeelingLucky(orcabot, message, searchTerm) {
   const googleAPIKey = keys.googleAPIKey;
   const youtube = google.youtube('v3');
 
@@ -244,6 +245,104 @@ function ytSearch(orcabot, message, searchTerm) {
   });
 }
 
+function musicSearch(orcabot, message, service, query) {
+  console.log(service);
+  console.log(query);
+  const platform = service.toLowerCase();
+  const userID = message.author.id;
+
+  if (platform === 'yt' || platform === 'youtube') {
+    // search YouTube
+    const googleAPIKey = keys.googleAPIKey;
+    const youtube = google.youtube('v3');
+    return new Promise((resolve, reject) => {
+
+      // YouTube API search request
+      youtube.search.list({
+        auth: googleAPIKey,
+        maxResults: 10,
+        part: 'snippet',
+        q: query,
+        type: 'video',
+      }, (err, data) => {
+        if (!err) {
+          if (!data.pageInfo.totalResults) {
+            // no results from query
+            orcabot.reply(message, 'No results found!');
+          } else {
+            // collect search results
+            const results = [];
+            for (let i = 0; i < data.items.length; i++) {
+              const element = data.items[i];
+              results.push({
+                title: element.snippet.title,
+                videoID: element.id.videoId,
+              });
+            }
+
+            // format search results in code block
+            let resultsList = '```';
+            results.forEach((element, index) => {
+              resultsList += `\n${index + 1}. "${element.title}"`;
+            });
+
+            resultsList += '\n```';
+            orcabot.reply(message, `Select from the following search results:\n${resultsList}`);
+
+            // prompt user for video choice
+            const getUserSelection = new Promise((fulfilled, rejected) => {
+              const validateSelection = (response) => {
+                // check if response author ID matches original search query author ID
+                if (response.author.id === userID) {
+                  // check for integer at beginning of user response
+                  if (!response.content.search(/^(\d+)/)) {
+                    const [choice] = response.content.match(/^(\d+)/);
+                    if (results[choice - 1] !== undefined) {
+                      // return user's video choice
+                      orcabot.removeListener('message', validateSelection);
+                      fulfilled(results[choice - 1]);
+                    } else {
+                      orcabot.reply(response, 'Enter a valid number to make your selection!');
+                    }
+                  }
+                }
+              };
+
+              // event listener for messages to catch user's video choice
+              orcabot.on('message', validateSelection);
+            });
+
+            // TODO: document
+            // @param: selection{object} contains title and YouTube videoID
+            getUserSelection.then((selection) => {
+              // get video info
+              youtube.videos.list({
+                auth: googleAPIKey,
+                part: 'snippet, contentDetails, status, statistics',
+                id: selection.videoID,
+              }, (error, data) => {
+                if (!error) {
+                  const url = `https://youtu.be/${selection.videoID}`;
+                  resolve(url);
+                } else {
+                  console.warn(`TT SEARCH YOUTUBE GET VIDEO INFO -- ${error}`);
+                  orcabot.reply(message, error);
+                  reject(error);
+                }
+              });
+            });
+          }
+        } else {
+          console.warn(`TT YOUTUBE SEARCH -- ${err}`);
+          reject(err);
+        }
+      });
+    });
+  } else if (platform === 'sc' || platform === 'soundcloud') {
+    // search SoundCloud
+  }
+}
+
 // print queue when prompted
 function printQueue(orcabot, message) {
   if (queue.length === 0) {
@@ -258,7 +357,7 @@ function printQueue(orcabot, message) {
 
       // output switch for platforms
       switch (track.platform) {
-        case 'SoundCloud':
+        case 'soundcloud':
           // SoundCloud
           list += `${track.artist} - "${track.title}"\n`;
           break;
@@ -278,7 +377,7 @@ function printQueue(orcabot, message) {
 function announceNowPlaying(orcabot, message) {
   const [track] = queue;
   switch (track.platform) {
-    case 'SoundCloud':
+    case 'soundcloud':
       // SoundCloud
       orcabot.reply(message, `Currently playing: \`${track.title}\` by \`${track.artist}\``);
       break;
@@ -356,7 +455,7 @@ export function turntable(orcabot, message) {
           soundcloud(orcabot, message, songURL, 'link');
         } else if (songURL.search(/youtube\.com/) !== -1) {
           // YouTube
-          ytdl(orcabot, message, songURL, 'YouTube');
+          ytdl(orcabot, message, songURL, 'youtube');
         } else {
           // youtubedl
           ytdl(orcabot, message, songURL);
@@ -389,8 +488,8 @@ export function turntable(orcabot, message) {
             soundcloud(orcabot, message, searchTerm, 'search');
           } else {
             // default to YouTube search
-            ytSearch(orcabot, message, searchTerm).then((searchResult) => {
-              ytdl(orcabot, message, searchResult, 'YouTube');
+            ytImFeelingLucky(orcabot, message, searchTerm).then((searchResult) => {
+              ytdl(orcabot, message, searchResult, 'youtube');
             }, (error) => {
               console.log(`YTDL PROMISE -- ${error}`);
               console.log(error);
@@ -401,6 +500,22 @@ export function turntable(orcabot, message) {
     }
 
     // TODO: search function
+    if (command.indexOf('search') === 0) {
+      const searchTerm = command.slice(6).trim();
+      let service = '';
+      let query = '';
+      if (!searchTerm.search(/(youtube|yt|soundcloud|sc)( )/)) {
+        service = searchTerm.split(' ', 1).shift();
+        query = searchTerm.slice(service.length).trim();
+      } else {
+        service = 'youtube';
+        query = searchTerm;
+      }
+
+      musicSearch(orcabot, message, service, query).then((searchResult) => {
+        ytdl(orcabot, message, searchResult, service);
+      });
+    }
 
     // check if there is a track playing or paused
     if (orcabot.voiceConnection.playing) {
