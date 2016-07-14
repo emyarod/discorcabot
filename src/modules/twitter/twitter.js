@@ -1,7 +1,7 @@
-import keys from '../cfg/opendoors';
-import twit from 'twit';
+import keys from '../../cfg/opendoors';
+import Twit from 'twit';
 
-const t = new twit({
+const t = new Twit({
   consumer_key: keys.twitterConsumerKey,
   consumer_secret: keys.twitterConsumerSecret,
   access_token: keys.twitterAccessToken,
@@ -15,8 +15,8 @@ export function twitter(orcabot, message) {
   if (user.length > 0) {
     t.get('statuses/user_timeline', {
       screen_name: user,
-      count: 1
-    }, (err, data, response) => {
+      count: 1,
+    }, (err, data) => {
       if (err) {
         // error handling
         console.warn(`TWITTER -- ${err}`);
@@ -28,29 +28,31 @@ export function twitter(orcabot, message) {
         // username
         const [{
           user: {
-            name: username
-          }
+            name: username,
+          },
         }] = data;
 
         // screen name
         const [{
           user: {
-            screen_name: screenName
-          }
+            screen_name: screenName,
+          },
         }] = data;
 
         // tweet body
         const [{
-          text: tweet
+          text: tweet,
         }] = data;
 
         // date posted
         const [{
-          created_at: date
+          created_at: date,
         }] = data;
 
         // output
-        orcabot.reply(message, `Most recent tweet by **${username} (@${screenName}) |** ${tweet} **|** ${date}`);
+        let content = 'Most recent tweet by';
+        content += `**${username} (@${screenName}) |** ${tweet} **|** ${date}`;
+        orcabot.reply(message, content);
       }
     });
   }

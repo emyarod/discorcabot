@@ -8,7 +8,7 @@ export function instagram(orcabot, message) {
   request(`https://www.instagram.com/${username}`, (e, res, html) => {
     if (!e && res.statusCode == 200) {
       // validate username
-      if (username == '') {
+      if (username === '') {
         return;
       }
 
@@ -19,7 +19,7 @@ export function instagram(orcabot, message) {
       });
 
       // find <script> tag containing public account info
-      var userID = $('script[type="text/javascript"]').map((index, element) => {
+      const userID = $('script[type="text/javascript"]').map((index, element) => {
         if ($(element).text().indexOf('window._sharedData') > -1) {
           // return value of window._sharedData variable as JSON
           return JSON.parse($(element).text().slice(21, -1));
@@ -28,15 +28,15 @@ export function instagram(orcabot, message) {
 
       // return if profile is private
       const {
-        '0': {
+        0: {
           entry_data: {
             ProfilePage: [{
               user: {
-                is_private: isPrivate
-              }
-            }]
-          }
-        }
+                is_private: isPrivate,
+              },
+            }],
+          },
+        },
       } = userID;
 
       if (isPrivate) {
@@ -46,17 +46,17 @@ export function instagram(orcabot, message) {
 
       // return if user has no posts
       const {
-        '0': {
+        0: {
           entry_data: {
             ProfilePage: [{
               user: {
                 media: {
-                  count: count
-                }
-              }
-            }]
-          }
-        }
+                  count: count,
+                },
+              },
+            }],
+          },
+        },
       } = userID;
 
       if (count === 0) {
@@ -66,31 +66,31 @@ export function instagram(orcabot, message) {
 
       // extract post details (username, caption, mediaURL)
       const {
-        '0': {
+        0: {
           entry_data: {
             ProfilePage: [{
               user: {
-                username: username
-              }
-            }]
-          }
-        }
+                username: username,
+              },
+            }],
+          },
+        },
       } = userID;
 
       let {
-        '0': {
+        0: {
           entry_data: {
             ProfilePage: [{
               user: {
                 media: {
                   nodes: [{
-                    caption: caption
-                  }]
-                }
-              }
-            }]
-          }
-        }
+                    caption: caption,
+                  }],
+                },
+              },
+            }],
+          },
+        },
       } = userID;
 
       // replace null caption with empty string
@@ -100,19 +100,19 @@ export function instagram(orcabot, message) {
 
       // check if the media node is a video
       const {
-        '0': {
+        0: {
           entry_data: {
             ProfilePage: [{
               user: {
                 media: {
                   nodes: [{
-                    is_video: isVideo
-                  }]
-                }
-              }
-            }]
-          }
-        }
+                    is_video: isVideo,
+                  }],
+                },
+              },
+            }],
+          },
+        },
       } = userID;
 
       function getMediaURL(isVideo) {
@@ -121,35 +121,35 @@ export function instagram(orcabot, message) {
           // scrape video link if the media node is a video
           if (isVideo) {
             const {
-              '0': {
+              0: {
                 entry_data: {
                   ProfilePage: [{
                     user: {
                       media: {
                         nodes: [{
-                          code: mediaCode
-                        }]
-                      }
-                    }
-                  }]
-                }
-              }
+                          code: mediaCode,
+                        }],
+                      },
+                    },
+                  }],
+                },
+              },
             } = userID;
 
             // scrape Instagram post page
             request(`https://www.instagram.com/p/${mediaCode}`, (e, res, html) => {
-              if (!e && res.statusCode == 200) {
+              if (!e && res.statusCode === 200) {
                 const $ = cheerio.load(html, {
                   lowerCaseTags: true,
                   xmlMode: true,
                 });
 
                 const {
-                  '0': {
+                  0: {
                     attribs: {
-                      content: mediaURL
-                    }
-                  }
+                      content: mediaURL,
+                    },
+                  },
                 } = $('meta[property="og:video:secure_url"]');
 
                 resolve(mediaURL);
@@ -158,19 +158,19 @@ export function instagram(orcabot, message) {
           } else {
             // extract image URL from JSON object into variable
             let {
-              '0': {
+              0: {
                 entry_data: {
                   ProfilePage: [{
                     user: {
                       media: {
                         nodes: [{
-                          display_src: mediaURL
-                        }]
-                      }
-                    }
-                  }]
-                }
-              }
+                          display_src: mediaURL,
+                        }],
+                      },
+                    },
+                  }],
+                },
+              },
             } = userID;
 
             /**
@@ -181,7 +181,7 @@ export function instagram(orcabot, message) {
             [mediaURL] = mediaURL.match(/.*?(?:\/[\w\.\-]+)+/);
             resolve(mediaURL);
           }
-        })
+        });
       }
 
       getMediaURL(isVideo).then((mediaURL) => {
@@ -202,7 +202,7 @@ export function instagram(orcabot, message) {
         }
       });
     } else {
-      console.warn('INSTAGRAM request -- ' + e);
+      console.warn(`INSTAGRAM request -- ${e}`);
       orcabot.reply(message, 'This Instagram account cannot be found!');
     }
   });

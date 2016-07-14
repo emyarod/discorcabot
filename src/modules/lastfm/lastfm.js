@@ -1,4 +1,4 @@
-import keys from '../cfg/opendoors';
+import keys from '../../cfg/opendoors';
 import LastfmAPI from 'lastfmapi';
 const Entities = require('html-entities').AllHtmlEntities;
 import fs from 'fs';
@@ -298,24 +298,26 @@ export function getWeeklyCharts(orcabot, message) {
         return;
       }
 
+      let mention = handle;
+
       // query lfmdb to see if handle is in the database
       for (const key in lfmdb) {
         if (lfmdb.hasOwnProperty(key)) {
           const element = lfmdb[key];
           if (element.discordUsername === handle) {
-            handle = `<@${key}>`;
+            mention = `<@${key}>`;
           }
         }
       }
 
-      let content = `Weekly Last.fm charts for **${handle} |**`;
+      let content = `Weekly Last.fm charts for **${mention} |**`;
 
       // check if user has scrobbled any songs in the last seven days
       if (topArtists.artist.length === 0) {
-        content = `**${handle}** has not scrobbled any songs in the last seven days!`
+        content = `**${mention}** has not scrobbled any songs in the last seven days!`;
       } else {
         const url = `http://www.last.fm/user/${handle}`;
-        let charts = [];
+        const charts = [];
 
         // push top artists and playcounts to array
         for (let i = 0; i < topArtists.artist.length; i++) {
@@ -374,7 +376,7 @@ export function getWeeklyCharts(orcabot, message) {
     }
 
     if (!found) {
-      orcabot.reply(message, `You are not in my Last.fm database! Use .addlfm <last.fm username> to add yourself to the database`);
+      orcabot.reply(message, 'You are not in my Last.fm database! Use `.addlfm <last.fm username>` to add yourself to the database');
     }
   }
 }

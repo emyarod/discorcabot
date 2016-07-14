@@ -1,8 +1,7 @@
-import keys from '../cfg/opendoors';
+import keys from '../../cfg/opendoors';
 import google from 'googleapis';
 import moment from 'moment';
 const googleAPIKey = keys.googleAPIKey;
-const customsearch = google.customsearch('v1');
 const urlshortener = google.urlshortener('v1');
 const youtube = google.youtube('v3');
 

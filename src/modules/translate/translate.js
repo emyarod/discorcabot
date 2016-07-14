@@ -1,11 +1,11 @@
-import keys from '../cfg/opendoors';
-import mstranslator from 'mstranslator';
+import keys from '../../cfg/opendoors';
+import Mstranslator from 'mstranslator';
 import request from 'request';
 
 // second parameter to constructor (true) indicates that the token should be auto-generated
-const translator = new mstranslator({
+const translator = new Mstranslator({
   client_id: keys.clientID,
-  client_secret: keys.msTranslatorKey
+  client_secret: keys.msTranslatorKey,
 }, true);
 
 export function textTranslate(orcabot, message) {
@@ -32,7 +32,7 @@ export function textTranslate(orcabot, message) {
     }
   });
 
-  let params = {
+  const params = {
     locale: 'en',
     languageCodes: [],
     text: '',
@@ -64,7 +64,7 @@ export function textTranslate(orcabot, message) {
           // converts language codes to language names
           translator.getLanguageNames(params, (error, languageNames) => {
             if (!error) {
-              let [inputLanguage, outputLanguage] = languageNames;
+              const [inputLanguage, outputLanguage] = languageNames;
 
               // output translation in English
               translator.translate(params, (error, translatedText) => {
@@ -89,7 +89,7 @@ export function textTranslate(orcabot, message) {
                       const form = req.form();
                       const filename = `${inputText}_${inputLanguage}_to_${outputLanguage}.mp3`;
                       form.append('file', audiostream, {
-                        filename: filename,
+                        filename,
                         contentType: params.format,
                       });
                     } else {
@@ -128,7 +128,7 @@ export function textTranslate(orcabot, message) {
       // converts language codes to language names
       translator.getLanguageNames(params, (error, languageNames) => {
         if (!error) {
-          let [inputLanguage, outputLanguage] = languageNames;
+          const [inputLanguage, outputLanguage] = languageNames;
 
           // output translation in English
           translator.translate(params, (error, translatedText) => {
@@ -166,7 +166,7 @@ export function textTranslate(orcabot, message) {
         // converts language codes to language names
         translator.getLanguageNames(params, (error, languageNames) => {
           if (!error) {
-            let [inputLanguage, outputLanguage] = languageNames;
+            const [inputLanguage, outputLanguage] = languageNames;
 
             // output translation in English
             translator.translate(params, (error, translatedText) => {
@@ -191,7 +191,7 @@ export function textTranslate(orcabot, message) {
                     const form = req.form();
                     const filename = `${inputText}_${inputLanguage}_to_${outputLanguage}.mp3`;
                     form.append('file', audiostream, {
-                      filename: filename,
+                      filename,
                       contentType: params.format,
                     });
                   } else {
