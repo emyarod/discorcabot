@@ -1,43 +1,43 @@
 export {
-  greeting
+  greeting,
 }
 from './greeting.js';
 
 export {
-  flex
+  flex,
 }
 from './flex.js';
 
 export {
-  twitter
+  twitter,
 }
-from './twitter.js';
+from './twitter/twitter.js';
 
 export {
-  instagram
+  instagram,
 }
-from './instagram.js';
+from './instagram/instagram.js';
 
 export {
   getSimilarArtists,
   getArtistInfo,
   addlfm,
   nowplaying,
-  getWeeklyCharts
+  getWeeklyCharts,
 }
-from './lastfm.js';
+from './lastfm/lastfm.js';
 
 export {
-  searchYouTube
+  searchYouTube,
 }
-from './youtube.js';
+from './youtube/youtube.js';
 
 export {
-  textTranslate
+  textTranslate,
 }
-from './translate.js';
+from './translate/translate.js';
 
 export {
-  turntable
+  turntable,
 }
-from './turntable.js';
+from './turntable/turntable.js';
