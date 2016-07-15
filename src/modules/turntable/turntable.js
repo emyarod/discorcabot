@@ -5,10 +5,10 @@ import youtubedl from 'youtube-dl';
 import google from 'googleapis';
 
 // TODO: implement radio/preset playlists
-function radio() {}
 
 // store tracks in currently selected (untitled) playlist
 let queue = [];
+let voteSkippers = [];
 import {
   player,
 } from './_player.js';
@@ -104,7 +104,7 @@ function soundcloud(orcabot, message, songURL, arg) {
 // request and load YouTube tracks or playlists
 function ytdl(orcabot, message, songURL, platform = null) {
   // YouTube loader
-  function ytdlLoader(orcabot, message, track) {
+  function ytdlLoader(track) {
     const title = track.title;
     const streamURL = track.url;
 
@@ -129,7 +129,7 @@ function ytdl(orcabot, message, songURL, platform = null) {
     const kind = info.playlist;
     if (kind === null) {
       // load track into queue
-      ytdlLoader(orcabot, message, info);
+      ytdlLoader(info);
 
       // announce queue additions
       const title = info.title;
@@ -138,7 +138,7 @@ function ytdl(orcabot, message, songURL, platform = null) {
       // load each track from playlist into queue
       for (let i = 0; i < info.length; i++) {
         const playlistTrack = info[i];
-        ytdlLoader(orcabot, message, playlistTrack);
+        ytdlLoader(playlistTrack);
       }
 
       // announce queue additions
@@ -413,9 +413,39 @@ function announceNowPlaying(orcabot, message) {
   }
 }
 
+function skipTrack(orcabot, message, voters) {
+  const voter = message.author.id;
+  if (voter === keys.botOwnerID) {
+    // skip if bot handler votes to skip
+    orcabot.sendMessage(message, 'Skipping current track!');
+    orcabot.voiceConnection.stopPlaying();
+  } else {
+    const members = orcabot.internal.user.voiceChannel.members.length - 1;
+    const threshold = members / 2;
+    if (voters.indexOf(voter) !== -1) {
+      // check if voter has already voted
+      orcabot.reply(message, 'You have already voted to skip this track!');
+    } else {
+      // add voter to skip list
+      voters.push(voter);
+      let voteMessage = `<@${voter}> has voted to skip the current track.`;
+
+      if (voters.length >= threshold) {
+        // skip track if threshold is reached
+        orcabot.sendMessage(message, 'Skipping current track!');
+        orcabot.voiceConnection.stopPlaying();
+      } else {
+        // announce number of votes needed to skip
+        voteMessage += ` ${threshold - voters.length} votes required`;
+        orcabot.sendMessage(message, voteMessage);
+      }
+    }
+  }
+}
+
 export function turntable(orcabot, message) {
   // console.log(message);
-  let command = message.content.slice(3).trim();
+  const command = message.content.slice(3).trim();
   const voiceChannel = message.author.voiceChannel;
 
   // check if user is in a voice channel
@@ -469,7 +499,7 @@ export function turntable(orcabot, message) {
       // load and play link
       const songURL = command.slice(4).trim();
       const validURL = urlRegex({
-        exact: true
+        exact: true,
       }).test(songURL);
 
       // if valid URL, send to appropriate loader
@@ -496,8 +526,8 @@ export function turntable(orcabot, message) {
           // play attached file if no search term
           if (message.attachments.length > 0) {
             // check if attachment exists
-            for (var i = 0; i < message.attachments.length; i++) {
-              var element = message.attachments[i];
+            for (let i = 0; i < message.attachments.length; i++) {
+              const element = message.attachments[i];
               // begin playback from start of queue
               loader(message, element.url, element.filename);
             }
@@ -566,10 +596,12 @@ export function turntable(orcabot, message) {
         announceNowPlaying(orcabot, message);
       }
 
-      // TODO: skip track (based on majority vote and/or bot handler ID)
+      // skip track (based on majority vote and/or bot handler ID)
+      if (command === 'skip') {
+        skipTrack(orcabot, message, voteSkippers);
+      }
 
       // TODO: shuffle
-
     } else if (orcabot.voiceConnection.paused) {
       // resume playback from pause
       if (command === 'resume') {
