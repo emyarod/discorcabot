@@ -107,7 +107,7 @@ export function instagram(orcabot, message) {
           return JSON.parse($(element).text().slice(21, -1));
         }
 
-        return 0;
+        return undefined;
       });
 
       // return if profile is private
