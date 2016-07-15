@@ -95,7 +95,7 @@ function skipTrack(orcabot, message, voters) {
 }
 
 export function turntable(orcabot, message) {
-  // console.log(message);
+  // console.error(message);
   const command = message.content.slice(3).trim();
   const voiceChannel = message.author.voiceChannel;
 
@@ -107,11 +107,11 @@ export function turntable(orcabot, message) {
 
   // enter voice channel of the user that calls the join command
   if (command === 'join') {
-    orcabot.joinVoiceChannel(voiceChannel, (error, connection) => {
+    orcabot.joinVoiceChannel(voiceChannel, (error) => {
       if (error) {
         orcabot.reply(message, 'Error joining voice channel!');
-        console.warn('TURNTABLE joinVoiceChannel -- ERROR');
-        console.warn(error);
+        console.error('TURNTABLE joinVoiceChannel -- ERROR');
+        console.error(error);
       }
     });
   }
@@ -125,11 +125,13 @@ export function turntable(orcabot, message) {
   if (command === 'clear') {
     queue.length = 0;
     orcabot.reply(message, 'Current queue cleared!');
-    console.log(queue);
+    console.error(queue);
   }
 
   // check if client.voiceConnection property exists and if user is in voice channel with bot
-  if (orcabot.voiceConnection !== undefined && orcabot.voiceConnection.id === message.author.voiceChannel.id) {
+  const connectedToVoice = orcabot.voiceConnection;
+  const botVoiceChannel = orcabot.voiceConnection.id;
+  if (connectedToVoice !== undefined && botVoiceChannel === message.author.voiceChannel.id) {
     // exit channel
     if (command === 'part') {
       // check if a track is currently playing
@@ -137,8 +139,8 @@ export function turntable(orcabot, message) {
         orcabot.leaveVoiceChannel(voiceChannel, (error) => {
           if (error) {
             orcabot.reply(message, 'Error leaving voice channel!');
-            console.warn('TURNTABLE leaveVoiceChannel -- ERROR');
-            console.warn(error);
+            console.error('TURNTABLE leaveVoiceChannel -- ERROR');
+            console.error(error);
           }
         });
       } else {
@@ -162,7 +164,7 @@ export function turntable(orcabot, message) {
           soundcloud(orcabot, message, songURL, 'link', queue);
         } else if (songURL.search(/youtube\.com/) !== -1) {
           // YouTube
-          ytdl(orcabot, message, songURL, queue, 'youtube');
+          ytdl(orcabot, message, songURL, queue, null, 'youtube');
         } else {
           // youtubedl
           ytdl(orcabot, message, songURL, queue);
@@ -170,7 +172,7 @@ export function turntable(orcabot, message) {
 
         // TODO: Spotify
       } else {
-        console.log('not a valid URL');
+        console.error('not a valid URL');
 
         // play attachment OR first search result
         let searchTerm = songURL;
@@ -187,8 +189,8 @@ export function turntable(orcabot, message) {
             ytImFeelingLucky(orcabot, message, searchTerm).then((searchResult) => {
               ytdl(orcabot, message, searchResult, queue, 'youtube');
             }, (error) => {
-              console.log(`YTDL PROMISE -- ${error}`);
-              console.log(error);
+              console.error(`YTDL PROMISE -- ${error}`);
+              console.error(error);
             });
           }
         }
@@ -210,7 +212,7 @@ export function turntable(orcabot, message) {
 
       musicSearch(orcabot, message, service, query).then((searchResult) => {
         if (service === 'youtube') {
-          ytdl(orcabot, message, searchResult, service);
+          ytdl(orcabot, message, searchResult, queue, service);
         } else {
           soundcloud(orcabot, message, searchResult, 'link', queue);
         }
