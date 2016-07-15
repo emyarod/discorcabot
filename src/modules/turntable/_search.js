@@ -45,7 +45,6 @@ export function musicSearch(orcabot, message, service, query) {
 
             // prompt user for video choice
             const getUserSelection = new Promise((fulfilled) => {
-              // console.log('asdf');
               const validateSelection = (response) => {
                 // check if response author ID matches original search query author ID
                 if (response.author.id === userID) {
@@ -80,7 +79,7 @@ export function musicSearch(orcabot, message, service, query) {
                   const url = `https://youtu.be/${selection.videoID}`;
                   resolve(url);
                 } else {
-                  console.warn(`TT SEARCH YOUTUBE GET VIDEO INFO -- ${error}`);
+                  console.error(`TT SEARCH YOUTUBE GET VIDEO INFO -- ${error}`);
                   orcabot.reply(message, error);
                   reject(error);
                 }
@@ -88,7 +87,7 @@ export function musicSearch(orcabot, message, service, query) {
             });
           }
         } else {
-          console.warn(`TT SEARCH YOUTUBE SEARCH -- ${err}`);
+          console.error(`TT SEARCH YOUTUBE SEARCH -- ${err}`);
           reject(err);
         }
       });
@@ -132,7 +131,6 @@ export function musicSearch(orcabot, message, service, query) {
 
             // prompt user for video choice
             const getUserSelection = new Promise((fulfilled) => {
-              // console.log('asdf');
               const validateSelection = (userResponse) => {
                 // check if response author ID matches original search query author ID
                 if (userResponse.author.id === userID) {
@@ -160,10 +158,12 @@ export function musicSearch(orcabot, message, service, query) {
           }
         } else {
           orcabot.reply(message, 'There was an error with your request!');
-          console.log(`TT SEARCH SOUNDCLOUD SEARCH LOADER -- ${error}`);
-          console.log(error);
+          console.error(`TT SEARCH SOUNDCLOUD SEARCH LOADER -- ${error}`);
+          console.error(error);
         }
       });
     });
   }
+
+  return 0;
 }
