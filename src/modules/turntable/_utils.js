@@ -1,3 +1,14 @@
+// add track details to current queue
+export function loader(queue, message, streamURL, title, artist = null, platform = null) {
+  queue.push({
+    artist,
+    title,
+    streamURL,
+    platform,
+    message,
+  });
+}
+
 // play top track from queue to voice channel
 export function player(orcabot, queue) {
   // stop if queue is empty
