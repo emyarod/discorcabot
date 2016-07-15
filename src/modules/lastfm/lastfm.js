@@ -1,18 +1,26 @@
 import keys from '../../cfg/opendoors';
 import LastfmAPI from 'lastfmapi';
-const Entities = require('html-entities').AllHtmlEntities;
 import fs from 'fs';
+const Entities = require('html-entities').AllHtmlEntities;
 
 const lfm = new LastfmAPI({
-  'api_key': keys.lfmApiKey,
-  'secret': keys.lfmSecret,
+  api_key: keys.lfmApiKey,
+  secret: keys.lfmSecret,
 });
 
-// .similar
+/**
+ * getSimilarArtists() outputs a list of artists similar to a given artist
+ * based on Last.fm's similarity spaces
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @return {Primitive} undefined
+ */
 export function getSimilarArtists(orcabot, message) {
   const artist = message.content.replace('.similar ', '');
+
+  // get 5 artists similar to the given artist
   lfm.artist.getSimilar({
-    artist: artist,
+    artist,
     autocorrect: 1,
     limit: 5,
   }, (err, similarArtists) => {
@@ -30,14 +38,14 @@ export function getSimilarArtists(orcabot, message) {
         numSimilarArtists = 5;
       }
 
-      let charts = [];
+      const charts = [];
       for (let i = 0; i < numSimilarArtists; i++) {
         const {
           name: name,
           match: match,
         } = similarArtists.artist[i];
 
-        charts.push(`**${name}** (${(match * 100).toFixed(2)}% match)`);
+        charts.push(`\`${name}\` (${(match * 100).toFixed(2)}% match)`);
       }
 
       orcabot.reply(message, `artists similar to **${artist}:** ${charts.join(', ')}`);
@@ -46,13 +54,21 @@ export function getSimilarArtists(orcabot, message) {
 }
 
 // .getinfo
+/**
+ * getArtistInfo() outputs Last.fm's description of a given artist
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @return {Primitive} undefined
+ */
 export function getArtistInfo(orcabot, message) {
   const entities = new Entities();
   const artist = message.content.replace('.getinfo ', '');
+
+  // get metadata for an artist, including biography truncated at 300 characters
   lfm.artist.getInfo({
-    artist: artist,
+    artist,
     autocorrect: 1,
-  }, (err, artist) => {
+  }, (err, artistInfo) => {
     if (err) {
       orcabot.reply(message, `**${artist}** is not a valid artist on Last.fm!`);
       console.warn(`LAST.FM .getinfo -- ${err.message}`);
@@ -61,22 +77,23 @@ export function getArtistInfo(orcabot, message) {
     }
 
     // strip html, strip whitespace, decode entities, trim
-    let reply = entities.decode(artist.bio.summary);
+    let reply = entities.decode(artistInfo.bio.summary);
     reply = reply.replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim();
 
     // slice largest image from array of returned images
     let {
-      image: image
-    } = artist;
+      image: image,
+    } = artistInfo;
 
     [{
-      '#text': image
+      '#text': image,
     }] = image.slice(-3, -2);
 
     // attach image if Last.fm returns an image
     if (image !== '') {
-      orcabot.sendFile(message, image, null, reply, (error, message) => {
+      orcabot.sendFile(message, image, null, reply, (error) => {
         if (error) {
+          orcabot.reply(message, 'There was an error resolving your request!');
           console.warn(`LAST.FM .getinfo sendFile -- ${error}`);
         }
       });
@@ -87,21 +104,29 @@ export function getArtistInfo(orcabot, message) {
 }
 
 // file path relative to output file
-const lfmdbPATH = `src/cfg/lastfmdb.json`;
+const lfmdbPATH = 'src/cfg/lastfmdb.json';
 let lfmdb = {};
 
+// read contents of the bot's Last.fm database
 fs.readFile(lfmdbPATH, 'utf8', (err, data) => {
   if (err) throw err;
   lfmdb = JSON.parse(data);
 });
 
-// add to db
+/**
+ * addlfm() will add a new user to the bot's Last.fm account database
+ * depending on whether or not the account exists or has already been added
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @return {Primitive} undefined
+ */
 export function addlfm(orcabot, message) {
   const discordID = message.author.id;
   const discordUsername = message.author.username;
   const lfmUsername = message.content.replace('.addlfm ', '');
 
-  lfm.user.getInfo(lfmUsername, (err, info) => {
+  // get information about a user profile
+  lfm.user.getInfo(lfmUsername, (err) => {
     if (err) {
       orcabot.reply(message, `**${lfmUsername}** is not a registered username on Last.fm!`);
       console.warn(`LAST.FM .addlfm -- ${err.message}`);
@@ -114,14 +139,18 @@ export function addlfm(orcabot, message) {
     } else {
       // add discordID - Last.fm username pair to db
       lfmdb[discordID] = {
-        'discordUsername': discordUsername,
-        'lfmUsername': lfmUsername,
+        discordUsername,
+        lfmUsername,
       };
 
       // write updated data to file
-      fs.writeFile(lfmdbPATH, JSON.stringify(lfmdb, null, 4), (err) => {
-        if (err) throw err;
-        console.log('LAST.FM DATABASE UPDATED');
+      fs.writeFile(lfmdbPATH, JSON.stringify(lfmdb, null, 4), (error) => {
+        if (error) {
+          orcabot.reply(message, 'There was an error writing to the Last.fm database!');
+          console.warn(`LAST.FM WRITEFILE -- ${error}`);
+        }
+
+        console.warn('LAST.FM DATABASE UPDATED');
       });
 
       orcabot.reply(message, `you are now linked to Last.fm user **${lfmUsername}**`);
@@ -130,15 +159,29 @@ export function addlfm(orcabot, message) {
 }
 
 // now playing .np <self/lfm username/linked username>
+/**
+ * nowplaying() outputs the current or most recently listened track by a given user
+ * after checking whether or not the user is contained in the bot's local database
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @return {Primitive} undefined
+ */
 export function nowplaying(orcabot, message) {
+  /**
+   * np() retrieves the current or most recently listened track by a given user
+   * @param {String} handle Last.fm handle to look up
+   * @return {Primitive} undefined
+   */
   function np(handle) {
+    // get the current or most recently listened track by a given user
     lfm.user.getRecentTracks({
       user: handle,
       limit: 1,
       extended: 1,
     }, (err, recentTracks) => {
+      let username = handle;
       if (err) {
-        orcabot.reply(message, `**${handle}** is not a registered username on Last.fm!`);
+        orcabot.reply(message, `**${username}** is not a registered username on Last.fm!`);
         console.warn(`LAST.FM .np -- ${err.message}`);
         return;
       }
@@ -146,65 +189,63 @@ export function nowplaying(orcabot, message) {
       // track name
       const {
         track: [{
-          name: trackname
-        }]
+          name: trackname,
+        }],
       } = recentTracks;
 
       // track image (can be empty string)
       const {
-        '#text': image
+        '#text': image,
       } = recentTracks.track[0].image.pop();
 
       // track artist
       const {
         track: [{
           artist: {
-            name: artist
-          }
-        }]
+            name: artist,
+          },
+        }],
       } = recentTracks;
 
       // album
       const {
         track: [{
           album: {
-            '#text': album
-          }
-        }]
+            '#text': album,
+          },
+        }],
       } = recentTracks;
 
       // currently scrobbling
       const {
         track: [{
-          '@attr': nowscrobbling
-        }]
+          '@attr': nowscrobbling,
+        }],
       } = recentTracks;
 
       // loved track (can be 0 or 1);
       const {
         track: [{
-          loved: loved
-        }]
+          loved: loved,
+        }],
       } = recentTracks;
 
-      const url = `http://www.last.fm/user/${handle}`;
+      const url = `http://www.last.fm/user/${username}`;
       let content;
 
-      // query lfmdb to see if handle is in the database
-      for (const key in lfmdb) {
-        if (lfmdb.hasOwnProperty(key)) {
-          const element = lfmdb[key];
-          if (element.discordUsername === handle) {
-            handle = `<@${key}>`;
-          }
+      // query lfmdb to see if username is in the database
+      Object.keys(lfmdb).forEach((key) => {
+        const element = lfmdb[key];
+        if (element.discordUsername === username) {
+          username = `<@${key}>`;
         }
-      }
+      }, this);
 
       // if scrobbling, prepend is listening to, else prepend 'last listened to'
       if (nowscrobbling === undefined) {
-        content = `**${handle}** last listened to`;
+        content = `**${username}** last listened to`;
       } else {
-        content = `**${handle}** is listening to`;
+        content = `**${username}** is listening to`;
       }
 
       // adjust output text based on album metadata
@@ -215,7 +256,7 @@ export function nowplaying(orcabot, message) {
       }
 
       // check if user loves track
-      if (loved == 1) {
+      if (loved === 1) {
         content += ' **|** ❤';
       } else {
         content += ' **|** 💔';
@@ -223,8 +264,9 @@ export function nowplaying(orcabot, message) {
 
       // attach image if Last.fm returns an image
       if (image !== '') {
-        orcabot.sendFile(message, image, null, content, (error, message) => {
+        orcabot.sendFile(message, image, null, content, (error) => {
           if (error) {
+            orcabot.reply(message, 'There was an error resolving your request!');
             console.warn(`LAST.FM .np sendFile -- ${error}`);
           }
         });
@@ -243,21 +285,19 @@ export function nowplaying(orcabot, message) {
       // [name] is not a mention
       np(lfmUsername);
     } else {
-      // [name] is a mention, so [name] == <@discordID>
+      // [name] is a mention, so [name] === <@discordID>
       lfmUsername = lfmUsername.slice(2, -1);
 
       // check if [name] is in database
       let found = false;
-      for (var key in lfmdb) {
-        if (lfmdb.hasOwnProperty(key)) {
-          var element = lfmdb[key];
-          if (key == lfmUsername) {
-            lfmUsername = element.lfmUsername;
-            found = true;
-            np(lfmUsername);
-          }
+      Object.keys(lfmdb).forEach((key) => {
+        const element = lfmdb[key];
+        if (key === lfmUsername) {
+          lfmUsername = element.lfmUsername;
+          found = true;
+          np(lfmUsername);
         }
-      }
+      }, this);
 
       if (!found) {
         orcabot.reply(message, `<@${lfmUsername}> is not in my Last.fm database!`);
@@ -267,26 +307,38 @@ export function nowplaying(orcabot, message) {
     // check if discordID is in database
     let found = false;
     let lfmUsername = message.author.id;
-    for (var key in lfmdb) {
-      if (lfmdb.hasOwnProperty(key)) {
-        var element = lfmdb[key];
-        if (key == lfmUsername) {
-          lfmUsername = element.lfmUsername;
-          found = true;
-          np(lfmUsername);
-        }
+    Object.keys(lfmdb).forEach((key) => {
+      const element = lfmdb[key];
+      if (key === lfmUsername) {
+        lfmUsername = element.lfmUsername;
+        found = true;
+        np(lfmUsername);
       }
-    }
+    }, this);
 
     if (!found) {
-      orcabot.reply(message, `You are not in my Last.fm database! Use .addlfm <last.fm username> to add yourself to the database`);
+      let content = 'You are not in my Last.fm database! ';
+      content += 'Use .addlfm <last.fm username> to add yourself to the database';
+      orcabot.reply(message, content);
     }
   }
 }
 
 // weekly charts .charts <self/user/registered handle>
+/**
+ * getWeeklyCharts() outputs the most popular artists for a given Last.fm user in the last week
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @return {Primitive} undefined
+ */
 export function getWeeklyCharts(orcabot, message) {
+  /**
+   * getCharts() retrieves a Last.fm user's most popular artists in the last week
+   * along with relevant listening statistics
+   * @param {String} handle Last.fm handle to look up
+   */
   function getCharts(handle) {
+    // get the top artists listened to by the given user in the past week
     lfm.user.getTopArtists({
       user: handle,
       period: '7day',
@@ -301,14 +353,12 @@ export function getWeeklyCharts(orcabot, message) {
       let mention = handle;
 
       // query lfmdb to see if handle is in the database
-      for (const key in lfmdb) {
-        if (lfmdb.hasOwnProperty(key)) {
-          const element = lfmdb[key];
-          if (element.discordUsername === handle) {
-            mention = `<@${key}>`;
-          }
+      Object.keys(lfmdb).forEach((key) => {
+        const element = lfmdb[key];
+        if (element.discordUsername === handle) {
+          mention = `<@${key}>`;
         }
-      }
+      }, this);
 
       let content = `Weekly Last.fm charts for **${mention} |**`;
 
@@ -340,21 +390,19 @@ export function getWeeklyCharts(orcabot, message) {
       // [name] is not a mention
       getCharts(lfmUsername);
     } else {
-      // [name] is a mention, so [name] == <@discordID>
+      // [name] is a mention, so [name] === <@discordID>
       lfmUsername = lfmUsername.slice(2, -1);
 
       // check if [name] is in database
       let found = false;
-      for (var key in lfmdb) {
-        if (lfmdb.hasOwnProperty(key)) {
-          var element = lfmdb[key];
-          if (key == lfmUsername) {
-            lfmUsername = element.lfmUsername;
-            found = true;
-            getCharts(lfmUsername);
-          }
+      Object.keys(lfmdb).forEach((key) => {
+        const element = lfmdb[key];
+        if (key === lfmUsername) {
+          lfmUsername = element.lfmUsername;
+          found = true;
+          getCharts(lfmUsername);
         }
-      }
+      }, this);
 
       if (!found) {
         orcabot.reply(message, `<@${lfmUsername}> is not in my Last.fm database!`);
@@ -364,19 +412,19 @@ export function getWeeklyCharts(orcabot, message) {
     // check if discordID is in database
     let found = false;
     let lfmUsername = message.author.id;
-    for (var key in lfmdb) {
-      if (lfmdb.hasOwnProperty(key)) {
-        var element = lfmdb[key];
-        if (key == lfmUsername) {
-          lfmUsername = element.lfmUsername;
-          found = true;
-          getCharts(lfmUsername);
-        }
+    Object.keys(lfmdb).forEach((key) => {
+      const element = lfmdb[key];
+      if (key === lfmUsername) {
+        lfmUsername = element.lfmUsername;
+        found = true;
+        getCharts(lfmUsername);
       }
-    }
+    }, this);
 
     if (!found) {
-      orcabot.reply(message, 'You are not in my Last.fm database! Use `.addlfm <last.fm username>` to add yourself to the database');
+      let content = 'You are not in my Last.fm database! ';
+      content += 'Use `.addlfm <last.fm username>` to add yourself to the database';
+      orcabot.reply(message, content);
     }
   }
 }
