@@ -6,4 +6,10 @@ The bot scrapes the provided user's Instagram profile page for `<script>` tags c
 
 ### To use the Instagram module:
 
-`.ig <Instagram username>`
+Arguments enclosed in angle brackets (**`< >`**) are **required**, while arguments enclosed in square brackets (**`[ ]`**) are optional. A bar (**`|`**) denotes a multiple choice argument. Any argument with an at sign (**`@`**) must be a Discord user mention.
+
+```
+.ig <Instagram username>
+```
+
+Returns the most recent public post by an Instagram user.
