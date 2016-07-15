@@ -77,11 +77,11 @@ function getMediaURL(isVideo, userID) {
 }
 
 /**
- * instagram() returns the latest Instagram post of a given account
+ * instagram() outputs the latest Instagram post of a given account
  * based on user input
  * @param {Object} orcabot Discord.Client
  * @param {Object} message represents the data of the input message
- * @return {Boolean} unnamed Whether request occurred
+ * @return {Primitive} undefined
  */
 export function instagram(orcabot, message) {
   const user = message.content.replace('.ig ', '');
