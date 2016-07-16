@@ -8,12 +8,22 @@ import {
 } from './_utils.js';
 
 /**
- * SOUNDCLOUD LOADER
+ * soundcloud() requests and loads SoundCloud tracks or playlists
+ * and then passes the audio file to the media player
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @param {String} songURL either be a SoundCloud permalink or a search query
+ * @param {Boolean} validURL denotes whether the input is a link or a search term
+ * @param {Object} queue current playlist of songs
+ * @return {Primitive} undefined
  */
-
-// request and load SoundCloud tracks or playlists
-export function soundcloud(orcabot, message, songURL, arg, queue) {
-  // SoundCloud loader
+export function soundcloud(orcabot, message, songURL, validURL, queue) {
+  /**
+   * scLoader() passes track metadata gathered from SoundCloud
+   * into the loader() function
+   * @param {Object} track SoundCloud track object
+   * @return {Primitive} undefined
+   */
   function scLoader(track) {
     const artist = track.user.username;
     const title = track.title;
@@ -23,18 +33,7 @@ export function soundcloud(orcabot, message, songURL, arg, queue) {
     loader(queue, message, streamURL, title, artist, 'soundcloud');
   }
 
-  // TODO: possible cleanup
-  function singleTrackLoader(track) {
-    // load track into queue
-    scLoader(track);
-
-    // announce queue additions
-    const artist = track.user.username;
-    const title = track.title;
-    orcabot.reply(message, `Added \`${title}\` by \`${artist}\` to the queue!`);
-  }
-
-  if (arg === 'link') {
+  if (validURL) {
     const requestURL = `http://api.soundcloud.com/resolve.json?url=${songURL}&client_id=${keys.scClientID}`;
 
     // make call to SoundCloud API
@@ -45,7 +44,13 @@ export function soundcloud(orcabot, message, songURL, arg, queue) {
 
         // SoundCloud playlist/track handling
         if (kind === 'track') {
-          singleTrackLoader(track);
+          // load track into queue
+          scLoader(track);
+
+          // announce queue additions
+          const artist = track.user.username;
+          const title = track.title;
+          orcabot.reply(message, `Added \`${title}\` by \`${artist}\` to the queue!`);
         } else if (kind === 'playlist') {
           // load each track from playlist into queue
           for (let i = 0; i < track.tracks.length; i++) {
@@ -62,11 +67,11 @@ export function soundcloud(orcabot, message, songURL, arg, queue) {
         player(orcabot, queue);
       } else {
         orcabot.reply(message, 'There was an error with your request!');
-        console.log(`SOUNDCLOUD LOADER -- ${error}`);
-        console.log(error);
+        console.error(`SOUNDCLOUD LOADER -- ${error}`);
+        console.error(error);
       }
     });
-  } else if (arg === 'search') {
+  } else {
     // fetch top SoundCloud search result
     const searchTerm = songURL;
     const requestURL = `http://api.soundcloud.com/tracks.json?q=${searchTerm}&client_id=${keys.scClientID}`;
@@ -75,32 +80,46 @@ export function soundcloud(orcabot, message, songURL, arg, queue) {
     request(requestURL, (error, response, body) => {
       if (!error && response.statusCode === 200) {
         const [track] = JSON.parse(body);
-        singleTrackLoader(track);
+        // load track into queue
+        scLoader(track);
+
+        // announce queue additions
+        const artist = track.user.username;
+        const title = track.title;
+        orcabot.reply(message, `Added \`${title}\` by \`${artist}\` to the queue!`);
 
         // play top track from queue to voice channel
         player(orcabot, queue);
       } else {
         orcabot.reply(message, 'There was an error with your request!');
-        console.log(`SOUNDCLOUD SEARCH LOADER -- ${error}`);
-        console.log(error);
+        console.error(`SOUNDCLOUD SEARCH LOADER -- ${error}`);
+        console.error(error);
       }
     });
   }
 }
 
 /**
- * YOUTUBE & YTDL LOADERS
+ * ytdl() requests and loads YouTube tracks or playlists
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @param {String} songURL either be a SoundCloud permalink or a search query
+ * @param {Object} queue current playlist of songs
+ * @param {String} platform marks whether or not extra flags will be passed into ytdl
+ * @return {Primitive} undefined
  */
-
-// request and load YouTube tracks or playlists
 export function ytdl(orcabot, message, songURL, queue, platform = null) {
-  // YouTube loader
+  /**
+   * ytdlLoader() passes video information from youtube-dl.js into loader()
+   * @param {Object} track video information from youtube-dl.js
+   * @return {Primitive} undefined
+   */
   function ytdlLoader(track) {
     const title = track.title;
     const streamURL = track.url;
 
     // add track details to current queue
-    loader(queue, message, streamURL, title, 'ytdl');
+    loader(queue, message, streamURL, title, null, 'ytdl');
   }
 
   // set options based on service platform
@@ -112,13 +131,12 @@ export function ytdl(orcabot, message, songURL, queue, platform = null) {
   youtubedl.getInfo(songURL, options, (error, info) => {
     if (error) {
       orcabot.reply(message, 'There was an error with your request!');
-      console.log(`YOUTUBE LOADER -- ${error}`);
-      console.log(error);
+      console.error(`YOUTUBE LOADER -- ${error}`);
+      console.error(error);
     }
 
     // handler for individual tracks vs playlists
     const kind = info.playlist;
-    console.log(`kind = ${kind}`);
     if (kind === null) {
       // load track into queue
       ytdlLoader(info);
@@ -145,7 +163,13 @@ export function ytdl(orcabot, message, songURL, queue, platform = null) {
   });
 }
 
-// fetch top YouTube search result
+/**
+ * ytImFeelingLucky() fetches top YouTube search result and passes it into the music player
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @param {String} searchTerm search term to pass to YouTube API
+ * @return {Primitive} undefined
+ */
 export function ytImFeelingLucky(orcabot, message, searchTerm) {
   const googleAPIKey = keys.googleAPIKey;
   const youtube = google.youtube('v3');
@@ -181,23 +205,25 @@ export function ytImFeelingLucky(orcabot, message, searchTerm) {
               const url = `https://youtu.be/${videoID}`;
               resolve(url);
             } else {
-              console.warn(`TT YOUTUBE GET VIDEO INFO -- ${err}`);
+              console.error(`TT YOUTUBE GET VIDEO INFO -- ${err}`);
               orcabot.reply(message, err);
               reject(err);
             }
           });
         }
       } else {
-        console.warn(`TT YOUTUBE SEARCH -- ${error}`);
+        console.error(`TT YOUTUBE SEARCH -- ${error}`);
       }
     });
   });
 }
 
 /**
- * FILE ATTACHMENT LOADER
+ * attachmentLoader() passes a file attachment into the music player()
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @param {Object} queue current playlist of songs
  */
-
 export function attachmentLoader(orcabot, message, queue) {
   // play attached file if no search term
   if (message.attachments.length > 0) {
