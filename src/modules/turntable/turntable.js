@@ -130,7 +130,11 @@ export function turntable(orcabot, message) {
 
   // check if client.voiceConnection property exists and if user is in voice channel with bot
   const connectedToVoice = orcabot.voiceConnection;
-  const botVoiceChannel = orcabot.voiceConnection.id;
+  let botVoiceChannel;
+  if (connectedToVoice !== undefined) {
+    botVoiceChannel = orcabot.voiceConnection.id;
+  }
+
   if (connectedToVoice !== undefined && botVoiceChannel === message.author.voiceChannel.id) {
     // exit channel
     if (command === 'part') {
@@ -161,7 +165,7 @@ export function turntable(orcabot, message) {
         // loaders
         if (songURL.search(/soundcloud\.com/) !== -1) {
           // SoundCloud
-          soundcloud(orcabot, message, songURL, 'link', queue);
+          soundcloud(orcabot, message, songURL, validURL, queue);
         } else if (songURL.search(/youtube\.com/) !== -1) {
           // YouTube
           ytdl(orcabot, message, songURL, queue, null, 'youtube');
@@ -172,8 +176,6 @@ export function turntable(orcabot, message) {
 
         // TODO: Spotify
       } else {
-        console.error('not a valid URL');
-
         // play attachment OR first search result
         let searchTerm = songURL;
         if (!searchTerm.length) {
@@ -183,7 +185,7 @@ export function turntable(orcabot, message) {
           if (!searchTerm.search(/^(sc:)/)) {
             // search SoundCloud
             searchTerm = searchTerm.slice(3);
-            soundcloud(orcabot, message, searchTerm, 'search', queue);
+            soundcloud(orcabot, message, searchTerm, validURL, queue);
           } else {
             // default to YouTube search
             ytImFeelingLucky(orcabot, message, searchTerm).then((searchResult) => {
