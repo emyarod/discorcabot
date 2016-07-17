@@ -2,6 +2,15 @@ import keys from '../../cfg/opendoors';
 import request from 'request';
 import google from 'googleapis';
 
+/**
+ * musicSearch() takes a query and returns a list of results
+ * based on the content platform that the user selects
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @param {String} service media distribution platform (either YouTube or SoundCloud)
+ * @param {String} query the user's search term
+ * @return {Primitive} undefined
+ */
 export function musicSearch(orcabot, message, service, query) {
   const platform = service.toLowerCase();
   const userID = message.author.id;
