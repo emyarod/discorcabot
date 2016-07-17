@@ -25,8 +25,8 @@ export function player(orcabot, queue) {
       volume: 1,
     }, (error, streamIntent) => {
       if (error) {
-        console.log(`MUSIC PLAYER -- ${error}`);
-        console.log(error);
+        console.error(`MUSIC PLAYER -- ${error}`);
+        console.error(error);
       }
 
       // announce currently playing track
@@ -44,9 +44,7 @@ export function player(orcabot, queue) {
 
       // update queue on playback finish
       streamIntent.on('end', () => {
-        console.log('finished!!');
         queue.shift();
-        console.log(queue);
 
         // recursive call
         player(orcabot, queue);
