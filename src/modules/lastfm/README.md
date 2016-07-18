@@ -16,7 +16,7 @@ Returns a list of similar artists as well as a percentage value of how closely t
 
 **Arguments:**
 
-* `artist` an artist to compare on Last.fm
+* `<artist>` an artist to compare on Last.fm
 
 #### Artist description
 
@@ -28,7 +28,7 @@ Returns Last.fm's biography on the given artist.
 
 **Arguments:**
 
-* `artist` an artist to look up on Last.fm
+* `<artist>` an artist to look up on Last.fm
 
 #### Add to local database
 
@@ -40,7 +40,7 @@ Adds an entry in discorcabot's database, linking your unique Discord ID to the p
 
 **Arguments:**
 
-* `Last.fm username` The Last.fm account to be linked to a Discord account
+* `<Last.fm username>` The Last.fm account to be linked to a Discord account
 
 #### Now playing
 
@@ -52,9 +52,9 @@ Returns the currently playing or most recently scrobbled track on the associated
 
 **Arguments:**
 
-* `@Discord user` (optional) Check the currently playing or most recently played track of another Discord user who has a Last.fm account connected via Discorcabot
+* `[@Discord user]` (optional) Check the currently playing or most recently played track of another Discord user who has a Last.fm account connected via Discorcabot
 
-* `Last.fm handle` (optional) Check the currently playing or most recently played track of a Last.fm user
+* `[Last.fm handle]` (optional) Check the currently playing or most recently played track of a Last.fm user
 
 #### Weekly charts
 
@@ -66,6 +66,6 @@ Returns the given user's top five most played artists in the last seven days on 
 
 **Arguments:**
 
-* `@Discord user` (optional) Check the currently playing or most recently played track of another Discord user who has a Last.fm account connected via Discorcabot
+* `[@Discord user]` (optional) Check the currently playing or most recently played track of another Discord user who has a Last.fm account connected via Discorcabot
 
-* `Last.fm handle` (optional) Check the currently playing or most recently played track of a Last.fm user
+* `[Last.fm handle]` (optional) Check the currently playing or most recently played track of a Last.fm user
