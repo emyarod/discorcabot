@@ -26,7 +26,11 @@ export function twitter(orcabot, message) {
       if (err) {
         // error handling
         console.warn(`TWITTER -- ${err}`);
-        orcabot.reply(message, err.message);
+        if (err.statusCode === 401) {
+          orcabot.reply(message, `**${user}**'s tweets are protected!`);
+        } else {
+          orcabot.reply(message, err.message);
+        }
       } else if ([data] === undefined) {
         // empty state
         orcabot.reply(message, `**${user}** hasn't tweeted yet!`);
