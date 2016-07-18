@@ -1,10 +1,12 @@
-## Turntable module
+# Turntable module
 
 The turntable module allows everyone in a given voice channel to interactively share and listen to music. Users can listen to the same tracks at the same time, while voting on tracks that are loved or unloved.
 
-### To use the turntable module:
+## To use the turntable module:
 
 Arguments enclosed in angle brackets (**`< >`**) are **required**, while arguments enclosed in square brackets (**`[ ]`**) are optional. A bar (**`|`**) denotes a multiple choice argument.
+
+### Join channel
 
 ```
 .dj join
@@ -12,11 +14,19 @@ Arguments enclosed in angle brackets (**`< >`**) are **required**, while argumen
 
 Calls the bot to enter yout voice channel
 
+---
+
+### Leave channel
+
 ```
 .dj part
 ```
 
 Removes the bot from your voice channel
+
+---
+
+### Print queue
 
 ```
 .dj list
@@ -24,11 +34,19 @@ Removes the bot from your voice channel
 
 Prints the current queue
 
+---
+
+### Clear queue
+
 ```
 .dj clear
 ```
 
 Empties the current queue
+
+---
+
+### Now playing
 
 ```
 .dj np
@@ -36,11 +54,19 @@ Empties the current queue
 
 Prints the currently playing track
 
+---
+
+### Pause
+
 ```
 .dj pause
 ```
 
 Pauses audio playback
+
+---
+
+### Resume
 
 ```
 .dj resume
@@ -48,11 +74,19 @@ Pauses audio playback
 
 Resumes audio playback
 
+---
+
+### Skip track
+
 ```
 .dj skip
 ```
 
 Casts a vote to skip the current track
+
+---
+
+### Play media
 
 ```
 .dj play <URL | search query>
@@ -65,6 +99,10 @@ Casts a vote to skip the current track
 ***OR***
 
 * `<search query>` A query to YouTube for the bot to play back the top result
+
+---
+
+### Search for media
 
 ```
 .dj search [platform] <search query>

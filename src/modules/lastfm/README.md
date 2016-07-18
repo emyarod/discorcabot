@@ -6,6 +6,8 @@ The Last.fm module allows the bot to retrieve statistics and information on arti
 
 Arguments enclosed in angle brackets (**`< >`**) are **required**, while arguments enclosed in square brackets (**`[ ]`**) are optional. A bar (**`|`**) denotes a multiple choice argument. Any argument with an at sign (**`@`**) must be a Discord user mention.
 
+---
+
 ### Similar artists
 
 ```
@@ -17,6 +19,8 @@ Returns a list of similar artists as well as a percentage value of how closely t
 **Arguments:**
 
 * `<artist>` an artist to compare on Last.fm
+
+---
 
 ### Artist description
 
@@ -30,6 +34,8 @@ Returns Last.fm's biography on the given artist.
 
 * `<artist>` an artist to look up on Last.fm
 
+---
+
 ### Add to local database
 
 ```
@@ -41,6 +47,8 @@ Adds an entry in discorcabot's database, linking your unique Discord ID to the p
 **Arguments:**
 
 * `<Last.fm username>` The Last.fm account to be linked to a Discord account
+
+---
 
 ### Now playing
 
@@ -55,6 +63,8 @@ Returns the currently playing or most recently scrobbled track on the associated
 * `[@Discord user]` (optional) Check the currently playing or most recently played track of another Discord user who has a Last.fm account connected via Discorcabot
 
 * `[Last.fm handle]` (optional) Check the currently playing or most recently played track of a Last.fm user
+
+---
 
 ### Weekly charts
 
