@@ -12,7 +12,11 @@ Arguments enclosed in angle brackets (**`< >`**) are **required**, while argumen
 .similar <artist>
 ```
 
-Returns a list of similar artists and a percentage value of how closely the artists match, according to Last.fm.
+Returns a list of similar artists as well as a percentage value of how closely the artists match, according to Last.fm.
+
+**Arguments:**
+
+* `artist` an artist to compare on Last.fm
 
 #### Artist description
 
@@ -22,6 +26,10 @@ Returns a list of similar artists and a percentage value of how closely the arti
 
 Returns Last.fm's biography on the given artist.
 
+**Arguments:**
+
+* `artist` an artist to look up on Last.fm
+
 #### Add to local database
 
 ```
@@ -29,6 +37,10 @@ Returns Last.fm's biography on the given artist.
 ```
 
 Adds an entry in discorcabot's database, linking your unique Discord ID to the provided Last.fm accounts.
+
+**Arguments:**
+
+* `Last.fm username` The Last.fm account to be linked to a Discord account
 
 #### Now playing
 
@@ -38,6 +50,12 @@ Adds an entry in discorcabot's database, linking your unique Discord ID to the p
 
 Returns the currently playing or most recently scrobbled track on the associated Last.fm account. If no argument is provided, discorcabot will look up its local database to see if the command caller is linked to a Last.fm account, and then fetch the data from Last.fm.
 
+**Arguments:**
+
+* `@Discord user` (optional) Check the currently playing or most recently played track of another Discord user who has a Last.fm account connected via Discorcabot
+
+* `Last.fm handle` (optional) Check the currently playing or most recently played track of a Last.fm user
+
 #### Weekly charts
 
 ```
@@ -45,3 +63,9 @@ Returns the currently playing or most recently scrobbled track on the associated
 ```
 
 Returns the given user's top five most played artists in the last seven days on Last.fm. If no argument is provided, discorcabot will look up its local database to see if the command caller is linked to a Last.fm account, and then fetch the data from Last.fm.
+
+**Arguments:**
+
+* `@Discord user` (optional) Check the currently playing or most recently played track of another Discord user who has a Last.fm account connected via Discorcabot
+
+* `Last.fm handle` (optional) Check the currently playing or most recently played track of a Last.fm user
