@@ -13,3 +13,7 @@ Arguments enclosed in angle brackets (**`< >`**) are **required**, while argumen
 ```
 
 Returns the most recent public post by an Instagram user.
+
+**Arguments:**
+
+* `<Instagram username>` the username of an Instagram user for the bot to look up
