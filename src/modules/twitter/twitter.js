@@ -8,6 +8,12 @@ const t = new Twit({
   access_token_secret: keys.twitterAccessTokenSecret,
 });
 
+/**
+ * twitter() returns the most recent tweet by a given user
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @return {Primitive} undefined
+ */
 export function twitter(orcabot, message) {
   const user = message.content.replace('.tw ', '');
 
