@@ -11,95 +11,91 @@ const lfm = new LastfmAPI({
 /**
  * getSimilarArtists() outputs a list of artists similar to a given artist
  * based on Last.fm's similarity spaces
- * @param {Object} orcabot Discord.Client
- * @param {Object} message represents the data of the input message
- * @return {Primitive} undefined
+ * @param {Object} message - represents the data of the input message
+ * @return {String} List of similar artists
  */
-export function getSimilarArtists(orcabot, message) {
+export function getSimilarArtists(message) {
   const artist = message.content.replace('.similar ', '');
 
-  // get 5 artists similar to the given artist
-  lfm.artist.getSimilar({
-    artist,
-    autocorrect: 1,
-    limit: 5,
-  }, (err, similarArtists) => {
-    if (err) {
-      orcabot.reply(message, '**Last.fm |** Artist not found!');
-      console.warn(`LAST.FM .similar -- ${err.message}`);
-      console.warn(err);
-    } else {
-      let numSimilarArtists = 0;
-
-      // list up to 5 similar artists
-      if ((similarArtists.artist).length < 5) {
-        numSimilarArtists = (similarArtists.artist).length;
+  return new Promise((resolve, reject) => {
+    // get 5 artists similar to the given artist
+    lfm.artist.getSimilar({
+      artist,
+      autocorrect: 1,
+      limit: 5,
+    }, (err, similarArtists) => {
+      if (err) {
+        console.warn(`LAST.FM .similar -- ${err.message}`);
+        console.warn(err);
+        reject('artist not found!');
       } else {
-        numSimilarArtists = 5;
+        let numSimilarArtists = 0;
+
+        // list up to 5 similar artists
+        if ((similarArtists.artist).length < 5) {
+          numSimilarArtists = (similarArtists.artist).length;
+        } else {
+          numSimilarArtists = 5;
+        }
+
+        const charts = [];
+        for (let i = 0; i < numSimilarArtists; i++) {
+          const {
+            name: name,
+            match: match,
+          } = similarArtists.artist[i];
+
+          charts.push(`\`${name}\` (${(match * 100).toFixed(2)}% match)`);
+        }
+
+        resolve(`artists similar to **${artist}:** ${charts.join(', ')}`);
       }
-
-      const charts = [];
-      for (let i = 0; i < numSimilarArtists; i++) {
-        const {
-          name: name,
-          match: match,
-        } = similarArtists.artist[i];
-
-        charts.push(`\`${name}\` (${(match * 100).toFixed(2)}% match)`);
-      }
-
-      orcabot.reply(message, `artists similar to **${artist}:** ${charts.join(', ')}`);
-    }
+    });
   });
 }
 
-// .getinfo
 /**
  * getArtistInfo() outputs Last.fm's description of a given artist
- * @param {Object} orcabot Discord.Client
- * @param {Object} message represents the data of the input message
- * @return {Primitive} undefined
+ * @param {Object} message - represents the data of the input message
+ * @return {Array} array with image (if returned by Last.fm) and response text
  */
-export function getArtistInfo(orcabot, message) {
+export function getArtistInfo(message) {
   const entities = new Entities();
   const artist = message.content.replace('.getinfo ', '');
 
-  // get metadata for an artist, including biography truncated at 300 characters
-  lfm.artist.getInfo({
-    artist,
-    autocorrect: 1,
-  }, (err, artistInfo) => {
-    if (err) {
-      orcabot.reply(message, `**${artist}** is not a valid artist on Last.fm!`);
-      console.warn(`LAST.FM .getinfo -- ${err.message}`);
-      console.warn(err);
-      return;
-    }
+  return new Promise((resolve, reject) => {
+    // get metadata for an artist, including biography truncated at 300 characters
+    lfm.artist.getInfo({
+      artist,
+      autocorrect: 1,
+    }, (err, artistInfo) => {
+      if (err) {
+        reject(`**${artist}** is not a valid artist on Last.fm!`);
+        console.warn(`LAST.FM .getinfo -- ${err.message}`);
+        console.warn(err);
+        return;
+      }
 
-    // strip html, strip whitespace, decode entities, trim
-    let reply = entities.decode(artistInfo.bio.summary);
-    reply = reply.replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim();
+      // strip html, strip whitespace, decode entities, trim
+      let reply = entities.decode(artistInfo.bio.summary);
+      reply = reply.replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim();
 
-    // slice largest image from array of returned images
-    let {
-      image: image,
-    } = artistInfo;
+      // slice largest image from array of returned images
+      let {
+        image: image,
+      } = artistInfo;
 
-    [{
-      '#text': image,
-    }] = image.slice(-3, -2);
+      [{
+        '#text': image,
+      }] = image.slice(-3, -2);
 
-    // attach image if Last.fm returns an image
-    if (image !== '') {
-      orcabot.sendFile(message, image, null, reply, (error) => {
-        if (error) {
-          orcabot.reply(message, 'There was an error resolving your request!');
-          console.warn(`LAST.FM .getinfo sendFile -- ${error}`);
-        }
-      });
-    } else {
-      orcabot.reply(message, reply);
-    }
+      // attach image if Last.fm returns an image
+      if (image !== '') {
+        resolve([image, reply]);
+      } else {
+        resolve([null, reply]);
+      }
+    });
   });
 }
 
@@ -118,7 +114,7 @@ fs.readFile(lfmdbPATH, 'utf8', (err, data) => {
  * depending on whether or not the account exists or has already been added
  * @param {Object} orcabot Discord.Client
  * @param {Object} message represents the data of the input message
- * @return {Primitive} undefined
+ * @return {Undefined}
  */
 export function addlfm(orcabot, message) {
   const discordID = message.author.id;
@@ -164,13 +160,13 @@ export function addlfm(orcabot, message) {
  * after checking whether or not the user is contained in the bot's local database
  * @param {Object} orcabot Discord.Client
  * @param {Object} message represents the data of the input message
- * @return {Primitive} undefined
+ * @return {Undefined}
  */
 export function nowplaying(orcabot, message) {
   /**
    * np() retrieves the current or most recently listened track by a given user
    * @param {String} handle Last.fm handle to look up
-   * @return {Primitive} undefined
+   * @return {Undefined}
    */
   function np(handle) {
     // get the current or most recently listened track by a given user
@@ -324,12 +320,11 @@ export function nowplaying(orcabot, message) {
   }
 }
 
-// weekly charts .charts <self/user/registered handle>
 /**
  * getWeeklyCharts() outputs the most popular artists for a given Last.fm user in the last week
  * @param {Object} orcabot Discord.Client
  * @param {Object} message represents the data of the input message
- * @return {Primitive} undefined
+ * @return {Undefined}
  */
 export function getWeeklyCharts(orcabot, message) {
   /**

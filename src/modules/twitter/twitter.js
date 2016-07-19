@@ -10,60 +10,61 @@ const t = new Twit({
 
 /**
  * twitter() returns the most recent tweet by a given user
- * @param {Object} orcabot Discord.Client
  * @param {Object} message represents the data of the input message
- * @return {Primitive} undefined
+ * @return {String} tweet body and details
  */
-export function twitter(orcabot, message) {
+export function twitter(message) {
   const user = message.content.replace('.tw ', '');
 
-  // Twitter API request
-  if (user.length > 0) {
-    t.get('statuses/user_timeline', {
-      screen_name: user,
-      count: 1,
-    }, (err, data) => {
-      if (err) {
-        // error handling
-        console.warn(`TWITTER -- ${err}`);
-        if (err.statusCode === 401) {
-          orcabot.reply(message, `**${user}**'s tweets are protected!`);
+  return new Promise((resolve, reject) => {
+    if (user.length > 0) {
+      // Twitter API request
+      t.get('statuses/user_timeline', {
+        screen_name: user,
+        count: 1,
+      }, (err, data) => {
+        if (err) {
+          // error handling
+          console.warn(`TWITTER -- ${err}`);
+          if (err.statusCode === 401) {
+            reject(`**${user}**'s tweets are protected!`);
+          } else {
+            reject(err.message);
+          }
+        } else if ([data] === undefined) {
+          // empty state
+          resolve(`**${user}** hasn't tweeted yet!`);
         } else {
-          orcabot.reply(message, err.message);
+          // username
+          const [{
+            user: {
+              name: username,
+            },
+          }] = data;
+
+          // screen name
+          const [{
+            user: {
+              screen_name: screenName,
+            },
+          }] = data;
+
+          // tweet body
+          const [{
+            text: tweet,
+          }] = data;
+
+          // date posted
+          const [{
+            created_at: date,
+          }] = data;
+
+          // output
+          let content = 'Most recent tweet by';
+          content += `**${username} (@${screenName}) |** ${tweet} **|** ${date}`;
+          resolve(content);
         }
-      } else if ([data] === undefined) {
-        // empty state
-        orcabot.reply(message, `**${user}** hasn't tweeted yet!`);
-      } else {
-        // username
-        const [{
-          user: {
-            name: username,
-          },
-        }] = data;
-
-        // screen name
-        const [{
-          user: {
-            screen_name: screenName,
-          },
-        }] = data;
-
-        // tweet body
-        const [{
-          text: tweet,
-        }] = data;
-
-        // date posted
-        const [{
-          created_at: date,
-        }] = data;
-
-        // output
-        let content = 'Most recent tweet by';
-        content += `**${username} (@${screenName}) |** ${tweet} **|** ${date}`;
-        orcabot.reply(message, content);
-      }
-    });
-  }
+      });
+    }
+  });
 }

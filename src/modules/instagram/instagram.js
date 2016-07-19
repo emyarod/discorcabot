@@ -3,9 +3,9 @@ import cheerio from 'cheerio';
 
 /**
  * getMediaURL() returns URL of latest Instagram post
- * @param {Boolean} isVideo Whether medium is image or video
- * @param {String} userID Instagram user ID
- * @return {String} mediaURL Direct link to Instagram medium
+ * @param {Boolean} isVideo - Whether medium is image or video
+ * @param {String} userID - Instagram user ID
+ * @return {String} mediaURL - Direct link to Instagram medium
  */
 function getMediaURL(isVideo, userID) {
   // use promise for async request in case media node is a video
@@ -79,150 +79,146 @@ function getMediaURL(isVideo, userID) {
 /**
  * instagram() outputs the latest Instagram post of a given account
  * based on user input
- * @param {Object} orcabot Discord.Client
- * @param {Object} message represents the data of the input message
- * @return {Primitive} undefined
+ * @param {Object} message - represents the data of the input message
+ * @return {Array} array containing the type of media, a media URL (if applicable),
+ * and response text
  */
-export function instagram(orcabot, message) {
+export function instagram(message) {
   const user = message.content.replace('.ig ', '');
 
-  // scrape profile page
-  request(`https://www.instagram.com/${user}`, (e, res, html) => {
-    if (!e && res.statusCode === 200) {
-      // validate user
-      if (user === '') {
-        return;
-      }
-
-      // scrape Instagram profile page
-      const $ = cheerio.load(html, {
-        lowerCaseTags: true,
-        xmlMode: true,
-      });
-
-      // find <script> tag containing public account info
-      const userID = $('script[type="text/javascript"]').map((index, element) => {
-        if ($(element).text().indexOf('window._sharedData') > -1) {
-          // return value of window._sharedData variable as JSON
-          return JSON.parse($(element).text().slice(21, -1));
+  return new Promise((resolve, reject) => {
+    // scrape profile page
+    request(`https://www.instagram.com/${user}`, (e, res, html) => {
+      if (!e && res.statusCode === 200) {
+        // validate user
+        if (user === '') {
+          return;
         }
 
-        return undefined;
-      });
+        // scrape Instagram profile page
+        const $ = cheerio.load(html, {
+          lowerCaseTags: true,
+          xmlMode: true,
+        });
 
-      // return if profile is private
-      const {
-        0: {
-          entry_data: {
-            ProfilePage: [{
-              user: {
-                is_private: isPrivate,
-              },
-            }],
-          },
-        },
-      } = userID;
+        // find <script> tag containing public account info
+        const userID = $('script[type="text/javascript"]').map((index, element) => {
+          if ($(element).text().indexOf('window._sharedData') > -1) {
+            // return value of window._sharedData variable as JSON
+            return JSON.parse($(element).text().slice(21, -1));
+          }
 
-      if (isPrivate) {
-        orcabot.reply(message, 'This Instagram account is private!');
-        return;
-      }
+          return undefined;
+        });
 
-      // return if user has no posts
-      const {
-        0: {
-          entry_data: {
-            ProfilePage: [{
-              user: {
-                media: {
-                  count: count,
+        // return if profile is private
+        const {
+          0: {
+            entry_data: {
+              ProfilePage: [{
+                user: {
+                  is_private: isPrivate,
                 },
-              },
-            }],
+              }],
+            },
           },
-        },
-      } = userID;
+        } = userID;
 
-      if (count === 0) {
-        orcabot.reply(message, 'This user has no posts yet!');
-        return;
-      }
-
-      // extract post details (username, caption, mediaURL)
-      const {
-        0: {
-          entry_data: {
-            ProfilePage: [{
-              user: {
-                username: username,
-              },
-            }],
-          },
-        },
-      } = userID;
-
-      let {
-        0: {
-          entry_data: {
-            ProfilePage: [{
-              user: {
-                media: {
-                  nodes: [{
-                    caption: caption,
-                  }],
-                },
-              },
-            }],
-          },
-        },
-      } = userID;
-
-      // replace null caption with empty string
-      if (caption == null) {
-        caption = '';
-      }
-
-      // check if the media node is a video
-      const {
-        0: {
-          entry_data: {
-            ProfilePage: [{
-              user: {
-                media: {
-                  nodes: [{
-                    is_video: isVideo,
-                  }],
-                },
-              },
-            }],
-          },
-        },
-      } = userID;
-
-      // get link to media then reply in chat
-      getMediaURL(isVideo, userID).then((mediaURL) => {
-        if (isVideo) {
-          // link video in chat
-          let content = 'Most recent Instagram post by ';
-          content += `**\`@${username}\`:** \`${caption}\`\n${mediaURL}`;
-          orcabot.sendMessage(message, content, (error) => {
-            if (error) {
-              console.warn(`INSTAGRAM sendMessage (video) -- ${error}`);
-            }
-          });
-        } else {
-          // attach image to reply
-          const content = `Most recent Instagram post by **\`@${username}\`:** \`${caption}\``;
-          orcabot.sendFile(message, mediaURL, null, content, (error) => {
-            if (error) {
-              console.warn(`INSTAGRAM sendFile (photo) -- ${error}`);
-            }
-          });
+        if (isPrivate) {
+          reject('This Instagram account is private!');
+          return;
         }
-      });
-    } else {
-      console.warn(`INSTAGRAM request -- ${e}`);
-      orcabot.reply(message, 'This Instagram account cannot be found!');
-    }
+
+        // return if user has no posts
+        const {
+          0: {
+            entry_data: {
+              ProfilePage: [{
+                user: {
+                  media: {
+                    count: count,
+                  },
+                },
+              }],
+            },
+          },
+        } = userID;
+
+        if (!count) {
+          reject('This user has no posts yet!');
+          return;
+        }
+
+        // extract post details (username, caption, mediaURL)
+        const {
+          0: {
+            entry_data: {
+              ProfilePage: [{
+                user: {
+                  username: username,
+                },
+              }],
+            },
+          },
+        } = userID;
+
+        let {
+          0: {
+            entry_data: {
+              ProfilePage: [{
+                user: {
+                  media: {
+                    nodes: [{
+                      caption: caption,
+                    }],
+                  },
+                },
+              }],
+            },
+          },
+        } = userID;
+
+        // replace null caption with empty string
+        if (caption == null) {
+          caption = '';
+        }
+
+        // check if the media node is a video
+        const {
+          0: {
+            entry_data: {
+              ProfilePage: [{
+                user: {
+                  media: {
+                    nodes: [{
+                      is_video: isVideo,
+                    }],
+                  },
+                },
+              }],
+            },
+          },
+        } = userID;
+
+        // get link to media then reply in chat
+        getMediaURL(isVideo, userID).then((mediaURL) => {
+          if (isVideo) {
+            // link video in chat
+            let content = 'Most recent Instagram post by ';
+            content += `**\`@${username}\`:** \`${caption}\`\n${mediaURL}`;
+            const response = ['video', mediaURL, content];
+            resolve(response);
+          } else {
+            // attach image to reply
+            const content = `Most recent Instagram post by **\`@${username}\`:** \`${caption}\``;
+            const response = ['image', mediaURL, content];
+            resolve(response);
+          }
+        });
+      } else {
+        console.warn(`INSTAGRAM request -- ${e}`);
+        reject('This Instagram account cannot be found!');
+      }
+    });
   });
 }
