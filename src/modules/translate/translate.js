@@ -46,7 +46,7 @@ export function textTranslate(orcabot, message) {
           params.language = detectedLanguage;
           params.languageCodes = [];
           params.languageCodes.push(params.from, params.to);
-          const inputText = message.content.substr(4).trim();
+          const inputText = message.content.slice(4).trim();
 
           // converts language codes to language names
           translator.getLanguageNames(params, (errs, languageNames) => {
@@ -108,7 +108,7 @@ export function textTranslate(orcabot, message) {
       const str = found.toString().split(':'); // '.tr code', 'code '
       params.from = (str[0].split(' '))[1];
       params.to = str[1].trim();
-      params.text = message.content.slice(found[0].length);
+      params.language = params.to;
       params.languageCodes = [];
       params.languageCodes.push(params.from, params.to);
 
@@ -118,14 +118,38 @@ export function textTranslate(orcabot, message) {
           const [inputLanguage, outputLanguage] = languageNames;
 
           // output translation in English
-          translator.translate(params, (e, translatedText) => {
-            if (!e) {
+          translator.translate(params, (err, translatedText) => {
+            if (!err) {
+              params.text = translatedText;
               const output = `${translatedText} (${inputLanguage} to ${outputLanguage})`;
               orcabot.reply(message, output);
+
+              translator.speak(params, (er, audiostream) => {
+                if (!er) {
+                  const uguu = 'https://uguu.se/api.php?d=upload-tool';
+                  const req = request.post(uguu, (e, response, body) => {
+                    if (e) {
+                      orcabot.reply(message, 'There was an error with your translation.');
+                      console.warn(e);
+                    } else {
+                      orcabot.reply(message, `Listen: ${body}`);
+                    }
+                  });
+
+                  const form = req.form();
+                  const filename = `${inputLanguage}_to_${outputLanguage}.mp3`;
+                  form.append('file', audiostream, {
+                    filename,
+                    contentType: params.format,
+                  });
+                } else {
+                  console.warn(er);
+                }
+              });
             } else {
               orcabot.reply(message, 'There was an error with your translation.');
-              console.warn(`TRANSLATOR not auto translate -- ${e}`);
-              console.warn(e);
+              console.warn(`TRANSLATOR not auto translate -- ${err}`);
+              console.warn(err);
             }
           });
         } else {
@@ -137,7 +161,7 @@ export function textTranslate(orcabot, message) {
     }
   } else if (!message.content.search(detectedLanguageToEnglish)) {
     // ".tr word or sentence", defaults to English output
-    const inputText = message.content.substr(4).trim();
+    const inputText = message.content.slice(4).trim();
     params.to = 'en';
     params.text = inputText;
 
