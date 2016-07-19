@@ -18,52 +18,67 @@ import {
   musicSearch,
 } from './_search.js';
 
-// print queue when prompted
-function printQueue(orcabot, message) {
-  if (queue.length === 0) {
-    orcabot.reply(message, 'The queue is currently empty!');
-  } else {
-    // enclose list in code block
-    let list = '```\n';
-
-    // append track details to list based on media platform
-    for (let i = 0; i < queue.length; i++) {
-      const track = queue[i];
-
-      // output switch for platforms
-      switch (track.platform) {
-        case 'soundcloud':
-          // SoundCloud
-          list += `${track.artist} - "${track.title}"\n`;
-          break;
-
-        default:
-          list += `"${track.title}"\n`;
-          break;
-      }
-    }
-
-    list += '```';
-    orcabot.reply(message, `Songs currently in the queue:\n${list}`);
+/**
+ * printQueue() prints the current queue to the text channel
+ * @return {String} current queue
+ */
+function printQueue() {
+  // queue is empty
+  if (!queue.length) {
+    return 'The queue is currently empty!';
   }
+
+  // enclose list in code block
+  let list = '```\n';
+
+  // append track details to list based on media platform
+  for (let i = 0; i < queue.length; i++) {
+    const track = queue[i];
+
+    // output switch for platforms
+    switch (track.platform) {
+      case 'soundcloud':
+        // SoundCloud
+        list += `${track.artist} - "${track.title}"\n`;
+        break;
+
+      default:
+        list += `"${track.title}"\n`;
+        break;
+    }
+  }
+
+  list += '```';
+  return `Songs currently in the queue:\n${list}`;
 }
 
-// return currently playing track
-function announceNowPlaying(orcabot, message) {
+/**
+ * announceNowPlaying() prints the currently playing track to the text channel
+ * @return {String} current track details
+ */
+function announceNowPlaying() {
   const [track] = queue;
+  let response;
   switch (track.platform) {
     case 'soundcloud':
       // SoundCloud
-      orcabot.reply(message, `Currently playing: \`${track.title}\` by \`${track.artist}\``);
+      response = `Currently playing: \`${track.title}\` by \`${track.artist}\``;
       break;
 
     default:
-      orcabot.reply(message, `Currently playing: \`${track.title}\``);
+      response = `Currently playing: \`${track.title}\``;
       break;
   }
+
+  return response;
 }
 
-// skip currently playing track
+/**
+ * skipTrack() skips the currently playing track
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @return {Undefined}
+ */
 function skipTrack(orcabot, message, voters) {
   const voter = message.author.id;
   if (voter === keys.botOwnerID) {
@@ -71,6 +86,7 @@ function skipTrack(orcabot, message, voters) {
     orcabot.sendMessage(message, 'Skipping current track!');
     orcabot.voiceConnection.stopPlaying();
   } else {
+    // number of people in the voice channel, excluding the bot itself
     const members = orcabot.internal.user.voiceChannel.members.length - 1;
     const threshold = members / 2;
     if (voters.indexOf(voter) !== -1) {
@@ -94,6 +110,13 @@ function skipTrack(orcabot, message, voters) {
   }
 }
 
+/**
+ * turntable() wrapper for the turntable plugin
+ * includes bot join/part, queue manipulation, media handling, and search
+ * @param {Object} orcabot Discord.Client
+ * @param {Object} message represents the data of the input message
+ * @return {Undefined}
+ */
 export function turntable(orcabot, message) {
   // console.error(message);
   const command = message.content.slice(3).trim();
@@ -118,7 +141,7 @@ export function turntable(orcabot, message) {
 
   // print queue
   if (command === 'list') {
-    printQueue(orcabot, message);
+    orcabot.reply(message, printQueue());
   }
 
   // clear queue
@@ -153,7 +176,7 @@ export function turntable(orcabot, message) {
     }
 
     // call relevant loader or search track for playback
-    if (command.indexOf('play') === 0) {
+    if (!command.indexOf('play')) {
       // load and play link
       const songURL = command.slice(4).trim();
       const validURL = urlRegex({
@@ -200,7 +223,7 @@ export function turntable(orcabot, message) {
     }
 
     // search function
-    if (command.indexOf('search') === 0) {
+    if (!command.indexOf('search')) {
       const searchTerm = command.slice(6).trim();
       let service = '';
       let query = '';
@@ -238,7 +261,7 @@ export function turntable(orcabot, message) {
 
       // return currently playing track
       if (command === 'np') {
-        announceNowPlaying(orcabot, message);
+        orcabot.reply(message, announceNowPlaying());
       }
 
       // skip track (based on majority vote and/or bot handler ID)
