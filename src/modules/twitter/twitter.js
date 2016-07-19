@@ -60,7 +60,7 @@ export function twitter(message) {
           }] = data;
 
           // output
-          let content = 'Most recent tweet by';
+          let content = 'Most recent tweet by ';
           content += `**${username} (@${screenName}) |** ${tweet} **|** ${date}`;
           resolve(content);
         }
