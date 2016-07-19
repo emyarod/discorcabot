@@ -1,9 +1,4 @@
 export {
-  greeting,
-}
-from './greeting.js';
-
-export {
   flex,
 }
 from './flex.js';
