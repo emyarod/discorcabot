@@ -272,7 +272,7 @@ export function nowplaying(orcabot, message) {
     });
   }
 
-  if (message.content.trim().search('.np ') === 0) {
+  if (!message.content.trim().search('.np ')) {
     // .np [name]
     let lfmUsername = message.content.replace('.np ', '');
 
@@ -358,7 +358,7 @@ export function getWeeklyCharts(orcabot, message) {
       let content = `Weekly Last.fm charts for **${mention} |**`;
 
       // check if user has scrobbled any songs in the last seven days
-      if (topArtists.artist.length === 0) {
+      if (!topArtists.artist.length) {
         content = `**${mention}** has not scrobbled any songs in the last seven days!`;
       } else {
         const url = `http://www.last.fm/user/${handle}`;
@@ -376,7 +376,7 @@ export function getWeeklyCharts(orcabot, message) {
     });
   }
 
-  if (message.content.trim().search('.charts ') === 0) {
+  if (!message.content.trim().search('.charts ')) {
     // .charts [name]
     let lfmUsername = message.content.replace('.charts ', '');
 
