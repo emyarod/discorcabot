@@ -1,10 +1,12 @@
-## Translation module
+# Translation module
 
 The translation module runs a query through Microsoft Translator and outputs a translation in the user's language of choice.
 
-### To use the translation module:
+## To use the translation module:
 
 Arguments enclosed in angle brackets (**`< >`**) are **required**, while arguments enclosed in square brackets (**`[ ]`**) are optional. A bar (**`|`**) denotes a multiple choice argument. **Language codes** refer to Microsoft's list of supported languages, which can be found [here](https://msdn.microsoft.com/en-us/library/hh456380.aspx).
+
+### Text translation
 
 ```
 .tr <input language code>:<output language code> <text to translate>
