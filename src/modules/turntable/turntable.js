@@ -148,7 +148,6 @@ export function turntable(orcabot, message) {
   if (command === 'clear') {
     queue.length = 0;
     orcabot.reply(message, 'Current queue cleared!');
-    console.error(queue);
   }
 
   // check if client.voiceConnection property exists and if user is in voice channel with bot
