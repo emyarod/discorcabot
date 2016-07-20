@@ -133,6 +133,7 @@ export function ytdl(orcabot, message, songURL, queue, platform = null) {
       orcabot.reply(message, 'There was an error with your request!');
       console.error(`YOUTUBE LOADER -- ${error}`);
       console.error(error);
+      return;
     }
 
     // handler for individual tracks vs playlists
