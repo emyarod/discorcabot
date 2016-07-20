@@ -80,8 +80,7 @@ function getMediaURL(isVideo, userID) {
  * instagram() outputs the latest Instagram post of a given account
  * based on user input
  * @param {Object} message - represents the data of the input message
- * @return {Array} array containing the type of media, a media URL (if applicable),
- * and response text
+ * @return {Array} array containing the media URL (if applicable) and response text
  */
 export function instagram(message) {
   const user = message.content.replace('.ig ', '');
@@ -206,12 +205,12 @@ export function instagram(message) {
             // link video in chat
             let content = 'Most recent Instagram post by ';
             content += `**\`@${username}\`:** \`${caption}\`\n${mediaURL}`;
-            const response = ['video', mediaURL, content];
+            const response = [content];
             resolve(response);
           } else {
             // attach image to reply
             const content = `Most recent Instagram post by **\`@${username}\`:** \`${caption}\``;
-            const response = ['image', mediaURL, content];
+            const response = [mediaURL, content];
             resolve(response);
           }
         });
