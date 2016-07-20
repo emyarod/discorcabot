@@ -74,6 +74,25 @@ function announceNowPlaying() {
 }
 
 /**
+ * shuffle() takes the current queue and rearranges each element
+ * using Durstenfeld shuffle algorithm
+ * shoutouts to http://stackoverflow.com/q/2450954/
+ * @param {Array} playlist - current queue
+ * @return {Array} shuffled playlist
+ */
+function shuffle(playlist) {
+  const q = playlist;
+  for (let i = 0; i < q.length; i++) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const element = q[i];
+    q[i] = q[j];
+    q[j] = element;
+  }
+
+  return q;
+}
+
+/**
  * skipTrack() skips the currently playing track
  * @param {Object} orcabot Discord.Client
  * @param {Object} message represents the data of the input message
@@ -268,7 +287,16 @@ export function turntable(orcabot, message) {
         skipTrack(orcabot, message, voteSkippers);
       }
 
-      // TODO: shuffle
+      // shuffles the queue
+      if (command === 'shuffle') {
+        const shuffled = shuffle(queue);
+        for (let i = 0; i < shuffled.length; i++) {
+          const element = shuffled[i];
+          queue[i] = element;
+        }
+
+        orcabot.reply(message, 'The queue has been shuffled!');
+      }
     } else if (orcabot.voiceConnection.paused) {
       // resume playback from pause
       if (command === 'resume') {
