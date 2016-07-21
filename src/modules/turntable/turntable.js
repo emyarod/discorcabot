@@ -249,8 +249,8 @@ export function turntable(orcabot, message) {
     // check if there is a track playing or paused
     if (orcabot.voiceConnection.playing) {
       // stop playback
-      if (command === 'stop') {
-        // TODO: implement working stop command
+      if (command === 'stop' && message.author.id === keys.botOwnerID) {
+        queue.length = 0;
         orcabot.voiceConnection.stopPlaying();
       }
 
