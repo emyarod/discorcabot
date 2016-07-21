@@ -1,5 +1,6 @@
 import keys from '../../cfg/opendoors';
 import urlRegex from 'url-regex';
+import _ from 'lodash';
 
 // TODO: implement radio/preset playlists
 
@@ -71,25 +72,6 @@ function announceNowPlaying() {
   }
 
   return response;
-}
-
-/**
- * shuffle() takes the current queue and rearranges each element
- * using Durstenfeld shuffle algorithm
- * shoutouts to http://stackoverflow.com/q/2450954/
- * @param {Array} playlist - current queue
- * @return {Array} shuffled playlist
- */
-function shuffle(playlist) {
-  const q = playlist;
-  for (let i = 0; i < q.length; i++) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const element = q[i];
-    q[i] = q[j];
-    q[j] = element;
-  }
-
-  return q;
 }
 
 /**
@@ -289,11 +271,10 @@ export function turntable(orcabot, message) {
 
       // shuffles the queue
       if (command === 'shuffle') {
-        const shuffled = shuffle(queue);
-        for (let i = 0; i < shuffled.length; i++) {
-          const element = shuffled[i];
-          queue[i] = element;
-        }
+        const shuffled = _.shuffle(queue);
+        queue.forEach((element, index) => {
+          queue[index] = shuffled[index];
+        }, this);
 
         orcabot.reply(message, 'The queue has been shuffled!');
       }
