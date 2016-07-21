@@ -36,3 +36,8 @@ export {
   turntable,
 }
 from './turntable/turntable.js';
+
+export {
+  matchEmotes,
+}
+from './emotes/emotes.js';
