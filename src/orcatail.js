@@ -4,128 +4,152 @@ import {
 } from './cfg/config.js';
 
 // import modules
-import {
-  flex,
-  twitter,
-  instagram,
-  getSimilarArtists,
-  getArtistInfo,
-  addlfm,
-  nowplaying,
-  getWeeklyCharts,
-  searchYouTube,
-  textTranslate,
-  turntable,
-} from './modules/_moduleloader.js';
+import * as modules from './modules/_moduleloader.js';
 
 orcabot.on('message', (message) => {
-  if (message.content === 'ping') {
-    orcabot.reply(message, 'pong');
-  }
-
-  // console.log(message);
-
   // nfz
-  flex(orcabot, message);
+  modules.flex(orcabot, message);
 
-  switch (true) {
-    case !message.content.search(/^(\.tw )/gi):
-      // Twitter
-      twitter(message).then((response) => {
-        orcabot.reply(message, response);
-      }, (error) => {
-        orcabot.reply(message, error);
+  const words = message.content.match(/((?:[a-z][a-z0-9_]*))/gi);
+  if (words !== null) {
+    const detectEmotes = new Promise((resolve) => {
+      modules.matchEmotes(words).then((response) => {
+        resolve(response);
       });
-      break;
+    });
 
-    case !message.content.search(/^(\.ig )/gi):
-      // Instagram
-      instagram(message).then((response) => {
-        const [responseType, mediaURL, content] = response;
-        if (responseType === 'video') {
-          // link video in chat
-          orcabot.sendMessage(message, content, (error) => {
-            if (error) {
-              console.warn(`INSTAGRAM sendMessage (video) -- ${error}`);
-            }
-          });
-        } else {
-          // attach image to reply
-          orcabot.sendFile(message, mediaURL, null, content, (error) => {
-            if (error) {
-              console.warn(`INSTAGRAM sendFile (photo) -- ${error}`);
-            }
-          });
-        }
-      }, (error) => {
-        orcabot.reply(message, error);
-      });
-      break;
-
-    case !message.content.search(/^(\.similar )/gi):
-      // Last.fm get similar artists
-      getSimilarArtists(message).then((response) => {
-        orcabot.reply(message, response);
-      }, (error) => {
-        orcabot.reply(message, error);
-      });
-      break;
-
-    case !message.content.search(/^(\.getinfo )/gi):
-      // Last.fm get artist info
-      getArtistInfo(message).then((response) => {
-        const [image, content] = response;
-        if (image !== null) {
-          // attach image if Last.fm returns an image
-          orcabot.sendFile(message, image, null, content, (error) => {
-            if (error) {
-              console.warn(`INSTAGRAM sendFile (photo) -- ${error}`);
-            }
-          });
-        } else {
-          orcabot.reply(message, content);
-        }
-      }, (error) => {
-        orcabot.reply(message, error);
-      });
-      break;
-
-    case !message.content.search(/^(\.addlfm )/gi):
-      // Last.fm add lfm username to db
-      addlfm(orcabot, message);
-      break;
-
-    case !message.content.search(/^(\.np)/gi):
-      // Last.fm now playing .np <self/user/registered handle>
-      nowplaying(orcabot, message);
-      break;
-
-    case !message.content.search(/^(\.charts)/gi):
-      // Last.fm weekly charts .charts <self/user/registered handle>
-      getWeeklyCharts(orcabot, message);
-      break;
-
-    case !message.content.search(/^(\.yt )/gi) && message.content !== '.yt ':
-      // YouTube
-      searchYouTube(message).then((response) => {
-        orcabot.reply(message, response);
-      }, (error) => {
-        orcabot.reply(message, error);
-      });
-      break;
-
-    case !message.content.search(/^(\.tr )/gi):
-      // translator
-      textTranslate(orcabot, message);
-      break;
-
-    case !message.content.search(/^(\.dj )/gi) && message.content !== '.dj ':
-      // turntable
-      turntable(orcabot, message);
-      break;
-
-    default:
-      // default
-      break;
+    detectEmotes.then((emotes) => {
+      emotes.forEach((element) => {
+        const [filename] = Object.keys(element);
+        const imageURL = element[filename];
+        orcabot.sendFile(message, imageURL, `${filename}.png`, null, (error) => {
+          if (error) {
+            orcabot.reply(message, 'There was an error resolving your request!');
+          }
+        });
+      }, this);
+    });
   }
+
+  if (!message.content.search(/^(\.dj )/gi) && message.content !== '.dj ') {
+    // turntable
+    modules.turntable(orcabot, message);
+    return;
+  }
+
+  // non-turntable modules
+  const moduleSwitch = new Promise((resolve, reject) => {
+    switch (true) {
+      case !message.content.search(/^(\.tw )/gi):
+        // Twitter
+        modules.twitter(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      case !message.content.search(/^(\.ig )/gi):
+        // Instagram
+        modules.instagram(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      case !message.content.search(/^(\.similar )/gi):
+        // Last.fm get similar artists
+        modules.getSimilarArtists(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      case !message.content.search(/^(\.getinfo )/gi):
+        // Last.fm get artist info
+        modules.getArtistInfo(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      case !message.content.search(/^(\.addlfm )/gi):
+        // Last.fm add lfm username to db
+        modules.addlfm(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      case !message.content.search(/^(\.np)/gi):
+        // Last.fm now playing .np <self/user/registered handle>
+        modules.nowplaying(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      case !message.content.search(/^(\.charts)/gi):
+        // Last.fm weekly charts .charts <self/user/registered handle>
+        modules.getWeeklyCharts(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      case !message.content.search(/^(\.yt )/gi) && message.content !== '.yt ':
+        // YouTube
+        modules.searchYouTube(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      case !message.content.search(/^(\.tr )/gi):
+        // translator
+        modules.textTranslate(message)
+          .then((response) => {
+            resolve(response);
+          }, (error) => {
+            reject(error);
+          });
+        break;
+
+      default:
+        // default
+        break;
+    }
+  });
+
+  moduleSwitch.then((whalesong) => {
+    if (whalesong.length === 2) {
+      const [image, content] = whalesong;
+      orcabot.sendFile(message, image, null, content, (error) => {
+        if (error) {
+          orcabot.reply(message, 'There was an error resolving your request!');
+        }
+      });
+    } else if (whalesong.length === 1) {
+      orcabot.reply(message, [whalesong]);
+    } else {
+      orcabot.reply(message, whalesong);
+    }
+  }, (error) => {
+    orcabot.reply(message, error);
+  });
 });
