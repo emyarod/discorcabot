@@ -4,16 +4,16 @@ import gulp from 'gulp';
 import del from 'del';
 import webpack from 'webpack-stream';
 
-gulp.task('set-dev-node-env', () => {
+gulp.task('set-dev-node-env', () => (
   // set environment variable
-  return process.env.NODE_ENV = 'debug';
-  // return process.env.NODE_ENV = 'production';
-});
+  // process.env.NODE_ENV = 'debug'
+  process.env.NODE_ENV = 'production'
+));
 
 // clean out destination folders before rebuilding from source
-gulp.task('clean', ['set-dev-node-env'], () => {
-  return del(['./discorcabot.js']);
-});
+gulp.task('clean', ['set-dev-node-env'], () => (
+  del(['./discorcabot.js'])
+));
 
 /**
  * stream webpack config with babel presets and optimizations
@@ -23,11 +23,11 @@ gulp.task('clean', ['set-dev-node-env'], () => {
  * mangle and uglify if NODE_ENV == 'production'
  * output to destination
  */
-gulp.task('webpack', ['clean'], () => {
-  return gulp.src('src/orcatail.js')
-    .pipe(webpack(require('./webpack.config.js')))
-    .pipe(gulp.dest('./'));
-});
+gulp.task('webpack', ['clean'], () => (
+  gulp.src('src/orcatail.js')
+  .pipe(webpack(require('./webpack.config.js')))
+  .pipe(gulp.dest('./'))
+));
 
 // default task
 gulp.task('default', ['webpack'], () => {
