@@ -1,10 +1,9 @@
 #!/bin/bash
+# 
+# shoutouts to https://gist.github.com/JamieMason/4761049
+# check for dependencies, build, then run discorcabot
 
-# Functions ==============================================
-
-# return 1 if global command line program installed, else 0
-# example
-# echo "node: $(program_is_installed node)"
+# check for global command line program
 function program_is_installed {
   # set to 1 initially
   local return_=1
@@ -14,9 +13,7 @@ function program_is_installed {
   echo "$return_"
 }
 
-# return 1 if local npm package is installed at ./node_modules, else 0
-# example
-# echo "gruntacular : $(npm_package_is_installed gruntacular)"
+# check for local npm package
 function npm_package_is_installed {
   # set to 1 initially
   local return_=1
@@ -26,16 +23,12 @@ function npm_package_is_installed {
   echo "$return_"
 }
 
-# display a message in red with a cross by it
-# example
-# echo echo_fail "No"
+# display a failure message
 function echo_fail {
   printf "Not installed ${1}"
 }
 
-# display a message in green with a tick by it
-# example
-# echo echo_fail "Yes"
+# display a success message
 function echo_pass {
   printf "OK ${1}"
 }
@@ -52,15 +45,44 @@ function echo_if {
   fi
 }
 
-# ============================================== Functions
-
 # command line programs
-echo "node -- $(echo_if $(program_is_installed node))"
-echo "gulp -- $(echo_if $(program_is_installed gulp))"
+clineprograms[0]="node"
+clineprograms[1]="gulp"
+
+for program in ${clineprograms}; do
+  echo "$program -- $(echo_if $(program_is_installed $program))"
+done
 
 # local npm packages
-echo "gulp -- $(echo_if $(npm_package_is_installed gulp))"
+nodepackages[0]="gulp"
+nodepackages[1]="cheerio"
+nodepackages[2]="discord.js"
+nodepackages[3]="googleapis"
+nodepackages[4]="html-entities"
+nodepackages[5]="lastfmapi"
+nodepackages[6]="lodash"
+nodepackages[7]="moment"
+nodepackages[8]="mstranslator"
+nodepackages[9]="request"
+nodepackages[10]="twit"
+nodepackages[11]="url-regex"
+nodepackages[12]="youtube-dl"
+nodepackages[13]="babel-core"
+nodepackages[14]="babel-loader"
+nodepackages[15]="babel-preset-es2015"
+nodepackages[16]="del"
+nodepackages[17]="eslint"
+nodepackages[18]="eslint-config-airbnb"
+nodepackages[19]="eslint-plugin-import"
+nodepackages[20]="eslint-plugin-jsx-a11y"
+nodepackages[21]="eslint-plugin-react"
+nodepackages[22]="gulp"
+nodepackages[23]="webpack-node-externals"
+nodepackages[24]="webpack-stream"
 
+for pkg in ${nodepackages}; do
+  echo "$pkg -- $(echo_if $(program_is_installed $pkg))"
+done
 
 # gulp webpack
 # node ./discorcabot.js
