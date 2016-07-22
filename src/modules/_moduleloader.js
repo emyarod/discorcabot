@@ -4,6 +4,12 @@ export {
 from './flex.js';
 
 export {
+  commandList,
+  help,
+}
+from './help.js';
+
+export {
   twitter,
 }
 from './twitter/twitter.js';

@@ -40,6 +40,16 @@ orcabot.on('message', (message) => {
   // non-turntable modules
   const moduleSwitch = new Promise((resolve, reject) => {
     switch (true) {
+      case message.content === '.help':
+        // list commands
+        resolve(modules.commandList());
+        break;
+
+      case !message.content.search('.help '):
+        // command help
+        resolve(modules.help(message));
+        break;
+
       case !message.content.search(/^(\.tw )/gi):
         // Twitter
         modules.twitter(message)
