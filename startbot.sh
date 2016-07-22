@@ -84,5 +84,5 @@ for pkg in ${nodepackages}; do
   echo "$pkg -- $(echo_if $(program_is_installed $pkg))"
 done
 
-# gulp webpack
-# node ./discorcabot.js
+gulp webpack
+node ./discorcabot.js
