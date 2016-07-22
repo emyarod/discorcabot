@@ -10,6 +10,11 @@ export {
 from './help.js';
 
 export {
+  googlesearch,
+}
+from './google/googlesearch.js';
+
+export {
   twitter,
 }
 from './twitter/twitter.js';

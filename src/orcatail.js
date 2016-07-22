@@ -50,6 +50,11 @@ orcabot.on('message', (message) => {
         resolve(modules.help(message));
         break;
 
+      case (!message.content.search(/^(\.g )/gi)):
+        // google custom search engine (cse)
+        resolve(modules.googlesearch(message));
+        break;
+
       case !message.content.search(/^(\.tw )/gi):
         // Twitter
         modules.twitter(message)
