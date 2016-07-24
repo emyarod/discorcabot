@@ -7,6 +7,11 @@ import {
 import * as modules from './modules/_moduleloader.js';
 
 orcabot.on('message', (message) => {
+  // disregard bot messages
+  if (message.author.bot) {
+    return;
+  }
+
   // nfz
   modules.flex(orcabot, message);
 
