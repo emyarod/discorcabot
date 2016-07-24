@@ -35,3 +35,4 @@ node_modules
 discorcabot.js
 src/cfg/lastfmdb.json
 src/cfg/opendoors.js
+src/modules/flex.js
