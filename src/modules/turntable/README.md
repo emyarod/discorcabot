@@ -86,6 +86,16 @@ Casts a vote to skip the current track
 
 ---
 
+### Volume control
+
+```
+.dj volume <integer>
+```
+
+Sets volume to the given value (must be between 0 and 100)
+
+---
+
 ### Play media
 
 ```
