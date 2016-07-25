@@ -269,6 +269,15 @@ export function turntable(orcabot, message) {
         skipTrack(orcabot, message, voteSkippers);
       }
 
+      if (!command.indexOf('volume')) {
+        const [, volumeLevel] = command.split(' ');
+
+        if (volumeLevel > 0 && volumeLevel <= 100) {
+          orcabot.voiceConnection.setVolume(volumeLevel / 100);
+          orcabot.reply(message, `Volume set to ${volumeLevel}%`);
+        }
+      }
+
       // shuffles the queue
       if (command === 'shuffle') {
         const shuffled = _.shuffle(queue);
