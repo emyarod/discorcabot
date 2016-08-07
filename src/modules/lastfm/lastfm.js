@@ -280,7 +280,7 @@ export function nowplaying(message) {
         });
       } else {
         // [name] is a mention, so [name] === <@discordID>
-        lfmUsername = lfmUsername.slice(2, -1);
+        [lfmUsername] = lfmUsername.match(/(\d+)/);
 
         // check if [name] is in database
         let found = false;
@@ -400,7 +400,7 @@ export function getWeeklyCharts(message) {
         });
       } else {
         // [name] is a mention, so [name] === <@discordID>
-        lfmUsername = lfmUsername.slice(2, -1);
+        [lfmUsername] = lfmUsername.match(/(\d+)/);
 
         // check if [name] is in database
         let found = false;
