@@ -28,7 +28,7 @@ export function googlesearch(message) {
 
       if (!response.searchInformation.formattedTotalResults) {
         resolve('No results found!');
-      } else if (response.items && response.items.length > 0) {
+      } else if (response.items && response.items.length) {
         const searchResults = `https://www.google.com/?gws_rd=ssl#q=${query.replace(/ /g, '+')}`;
 
         // shorten search results url
