@@ -17,14 +17,8 @@ orcabot.on('message', (message) => {
 
   const words = message.content.match(/((?:[a-z][a-z0-9_]*))/gi);
   if (words !== null) {
-    const detectEmotes = new Promise((resolve) => {
-      modules.matchEmotes(words).then((response) => {
-        resolve(response);
-      });
-    });
-
-    detectEmotes.then((emotes) => {
-      emotes.forEach((element) => {
+    modules.matchEmotes(words).then(emotes => {
+      emotes.forEach(element => {
         const [filename] = Object.keys(element);
         const imageURL = element[filename];
         orcabot.sendFile(message, imageURL, `${filename}.png`, null, (error) => {
@@ -63,7 +57,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.tw )/gi):
         // Twitter
         modules.twitter(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
@@ -73,7 +67,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.ig )/gi):
         // Instagram
         modules.instagram(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
@@ -83,7 +77,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.similar )/gi):
         // Last.fm get similar artists
         modules.getSimilarArtists(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
@@ -93,7 +87,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.getinfo )/gi):
         // Last.fm get artist info
         modules.getArtistInfo(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
@@ -103,7 +97,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.addlfm )/gi):
         // Last.fm add lfm username to db
         modules.addlfm(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
@@ -113,7 +107,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.np)/gi):
         // Last.fm now playing .np <self/user/registered handle>
         modules.nowplaying(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
@@ -123,7 +117,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.charts)/gi):
         // Last.fm weekly charts .charts <self/user/registered handle>
         modules.getWeeklyCharts(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
@@ -133,7 +127,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.yt )/gi) && message.content !== '.yt ':
         // YouTube
         modules.searchYouTube(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
@@ -143,7 +137,7 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.tr )/gi):
         // translator
         modules.textTranslate(message)
-          .then((response) => {
+          .then(response => {
             resolve(response);
           }, (error) => {
             reject(error);
