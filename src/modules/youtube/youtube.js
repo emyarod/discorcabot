@@ -65,13 +65,7 @@ export function searchYouTube(message) {
           default:
             {
               // top search result = data.items[0]
-              const {
-                items: [{
-                  id: {
-                    videoId: videoID,
-                  },
-                }],
-              } = data;
+              const { items: [{ id: { videoId: videoID } }] } = data;
 
               // get video info
               youtube.videos.list({
@@ -80,42 +74,15 @@ export function searchYouTube(message) {
                 id: videoID,
               }, (e, result) => {
                 if (!e) {
-                  const {
-                    items: [{
-                      snippet: {
-                        title: videoTitle,
-                      },
-                    }],
-                  } = result;
-
-                  const {
-                    items: [{
-                      snippet: {
-                        channelTitle: channelName,
-                      },
-                    }],
-                  } = result;
-
-                  let {
-                    items: [{
-                      statistics: {
-                        viewCount: viewCount,
-                      },
-                    }],
-                  } = result;
+                  const { items: [{ snippet: { title: videoTitle } }] } = result;
+                  const { items: [{ snippet: { channelTitle: channelName } }] } = result;
+                  let { items: [{ statistics: { viewCount: viewCount } }] } = result;
 
                   // add commas to mark every third digit
                   viewCount = `\`${viewCount.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} views\``;
 
                   // parse ISO 8601 duration
-                  let {
-                    items: [{
-                      contentDetails: {
-                        duration: duration,
-                      },
-                    }],
-                  } = result;
-
+                  let { items: [{ contentDetails: { duration: duration } }] } = result;
                   duration = moment.duration(duration, moment.ISO_8601).asSeconds();
 
                   // convert video duration from basic ISO-8601 to h:m:s
@@ -147,10 +114,7 @@ export function searchYouTube(message) {
 
                   // find if video is age restricted
                   let contentRating = '';
-                  if (result.items[0].contentDetails.contentRating !== undefined) {
-                    contentRating = '**`[NSFW]`**';
-                  }
-
+                  if (result.items[0].contentDetails.contentRating) contentRating = '**`[NSFW]`**';
                   const url = `https://youtu.be/${videoID}`;
                   let content = `${contentRating} \`${videoTitle}\` by \`${channelName}\``;
                   content += ` | ${viewCount} | \`${duration}\` | ${url} | ${searchResults}`;
