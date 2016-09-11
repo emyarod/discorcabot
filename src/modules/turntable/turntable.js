@@ -25,9 +25,7 @@ import {
  */
 function printQueue() {
   // queue is empty
-  if (!queue.length) {
-    return 'The queue is currently empty!';
-  }
+  if (!queue.length) return 'The queue is currently empty!';
 
   // enclose list in code block
   let list = '```\n';
@@ -131,7 +129,7 @@ export function turntable(orcabot, message) {
 
   // enter voice channel of the user that calls the join command
   if (command === 'join') {
-    orcabot.joinVoiceChannel(voiceChannel, (error) => {
+    orcabot.joinVoiceChannel(voiceChannel, error => {
       if (error) {
         orcabot.reply(message, 'Error joining voice channel!');
         console.error('TURNTABLE joinVoiceChannel -- ERROR');
@@ -141,9 +139,7 @@ export function turntable(orcabot, message) {
   }
 
   // print queue
-  if (command === 'list') {
-    orcabot.reply(message, printQueue());
-  }
+  if (command === 'list') orcabot.reply(message, printQueue());
 
   // clear queue
   if (command === 'clear') {
@@ -153,17 +149,14 @@ export function turntable(orcabot, message) {
 
   // check if client.voiceConnection property exists and if user is in voice channel with bot
   const connectedToVoice = orcabot.voiceConnection;
-  let botVoiceChannel;
-  if (connectedToVoice !== undefined) {
-    botVoiceChannel = orcabot.voiceConnection.id;
-  }
+  const botVoiceChannel = connectedToVoice !== undefined ? connectedToVoice.id : null;
 
   if (connectedToVoice !== undefined && botVoiceChannel === message.author.voiceChannel.id) {
     // exit channel
     if (command === 'part') {
       // check if a track is currently playing
-      if (!orcabot.voiceConnection.playing) {
-        orcabot.leaveVoiceChannel(voiceChannel, (error) => {
+      if (!connectedToVoice.playing) {
+        orcabot.leaveVoiceChannel(voiceChannel, error => {
           if (error) {
             orcabot.reply(message, 'Error leaving voice channel!');
             console.error('TURNTABLE leaveVoiceChannel -- ERROR');
@@ -211,9 +204,9 @@ export function turntable(orcabot, message) {
             soundcloud(orcabot, message, searchTerm, validURL, queue);
           } else {
             // default to YouTube search
-            ytImFeelingLucky(orcabot, message, searchTerm).then((searchResult) => {
+            ytImFeelingLucky(orcabot, message, searchTerm).then(searchResult => {
               ytdl(orcabot, message, searchResult, queue, 'youtube');
-            }, (error) => {
+            }, error => {
               console.error(`YTDL PROMISE -- ${error}`);
               console.error(error);
             });
@@ -235,45 +228,39 @@ export function turntable(orcabot, message) {
         query = searchTerm;
       }
 
-      musicSearch(orcabot, message, service, query).then((searchResult) => {
+      musicSearch(orcabot, message, service, query).then(searchResult => {
         if (service === 'youtube') {
           ytdl(orcabot, message, searchResult, queue, service);
         } else {
           soundcloud(orcabot, message, searchResult, 'link', queue);
         }
-      }, (error) => {
+      }, error => {
         orcabot.reply(message, error);
       });
     }
 
     // check if there is a track playing or paused
-    if (orcabot.voiceConnection.playing) {
+    if (connectedToVoice.playing) {
       // stop playback
       if (command === 'stop' && message.author.id === keys.botOwnerID) {
         queue.length = 0;
-        orcabot.voiceConnection.stopPlaying();
+        connectedToVoice.stopPlaying();
       }
 
       // pause playback
-      if (command === 'pause') {
-        orcabot.voiceConnection.pause();
-      }
+      if (command === 'pause') connectedToVoice.pause();
 
       // return currently playing track
-      if (command === 'np') {
-        orcabot.reply(message, announceNowPlaying());
-      }
+      if (command === 'np') orcabot.reply(message, announceNowPlaying());
 
       // skip track (based on majority vote and/or bot handler ID)
-      if (command === 'skip') {
-        skipTrack(orcabot, message, voteSkippers);
-      }
+      if (command === 'skip') skipTrack(orcabot, message, voteSkippers);
 
       if (!command.indexOf('volume')) {
         const [, volumeLevel] = command.split(' ');
 
         if (volumeLevel > 0 && volumeLevel <= 100) {
-          orcabot.voiceConnection.setVolume(volumeLevel / 100);
+          connectedToVoice.setVolume(volumeLevel / 100);
           orcabot.reply(message, `Volume set to ${volumeLevel}%`);
         }
       }
@@ -287,11 +274,9 @@ export function turntable(orcabot, message) {
 
         orcabot.reply(message, 'The queue has been shuffled!');
       }
-    } else if (orcabot.voiceConnection.paused) {
+    } else if (connectedToVoice.paused) {
       // resume playback from pause
-      if (command === 'resume') {
-        orcabot.voiceConnection.resume();
-      }
+      if (command === 'resume') connectedToVoice.resume();
     }
   }
 }
