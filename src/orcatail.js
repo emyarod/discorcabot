@@ -6,14 +6,14 @@ import {
 // import modules
 import * as modules from './modules/_moduleloader.js';
 
-orcabot.on('message', (message) => {
+orcabot.on('ready', () => console.log('Ready!'));
+
+orcabot.on('message', message => {
   // disregard bot messages
-  if (message.author.bot) {
-    return;
-  }
+  if (message.author.bot) return;
 
   // nfz
-  modules.flex(orcabot, message);
+  modules.flex(message);
 
   const words = message.content.match(/((?:[a-z][a-z0-9_]*))/gi);
   if (words !== null) {
@@ -27,11 +27,8 @@ orcabot.on('message', (message) => {
       emotes.forEach((element) => {
         const [filename] = Object.keys(element);
         const imageURL = element[filename];
-        orcabot.sendFile(message, imageURL, `${filename}.png`, null, (error) => {
-          if (error) {
-            orcabot.reply(message, 'There was an error resolving your request!');
-          }
-        });
+        message.channel.sendFile(imageURL, `${filename}.png`)
+          .catch(console.log);
       }, this);
     });
   }
@@ -159,17 +156,14 @@ orcabot.on('message', (message) => {
   moduleSwitch.then((whalesong) => {
     if (whalesong.length === 2) {
       const [image, content] = whalesong;
-      orcabot.sendFile(message, image, null, content, (error) => {
-        if (error) {
-          orcabot.reply(message, 'There was an error resolving your request!');
-        }
-      });
+      message.channel.sendFile(image, null, content)
+        .catch(console.log);
     } else if (whalesong.length === 1) {
-      orcabot.reply(message, [whalesong]);
+      message.reply([whalesong]);
     } else {
-      orcabot.reply(message, whalesong);
+      message.reply(whalesong);
     }
   }, (error) => {
-    orcabot.reply(message, error);
+    message.reply(error);
   });
 });
