@@ -121,7 +121,7 @@ export function addlfm(message) {
         return;
       }
 
-      if (lfmdb[discordID] !== undefined && lfmdb[discordID].lfmUsername === lfmUsername) {
+      if (lfmdb[discordID] && lfmdb[discordID].lfmUsername === lfmUsername) {
         // if discordID - Last.fm username pair exists in db
         resolve(`You are already linked to **${lfmUsername}** on Last.fm!`);
       } else {
@@ -201,7 +201,7 @@ export function nowplaying(message) {
         }, this);
 
         // if scrobbling, prepend is listening to, else prepend 'last listened to'
-        if (nowscrobbling === undefined) {
+        if (!nowscrobbling) {
           content = `**${username}** last listened to`;
         } else {
           content = `**${username}** is listening to`;
