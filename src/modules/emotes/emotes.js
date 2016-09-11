@@ -25,12 +25,8 @@ function getEmotes() {
   });
 }
 
-getEmotes().then(() => {
-  // update emote list every 30 minutes
-  setInterval(() => {
-    getEmotes();
-  }, 1800000);
-});
+// update emote list every 30 minutes
+getEmotes().then(() => setInterval(() => getEmotes(), 1800000));
 
 /**
  * queryEmoteList() checks the user's input against the list of emote codes for a match
@@ -44,9 +40,7 @@ function queryEmoteList(emoteList, emoteCode) {
      * key === image_id && value === emoteCode
      * finds the key-value pair that matches the emoteCode provided
      */
-    const emoteDetails = _.findKey(emoteList, o => (
-      o.code === emoteCode
-    ));
+    const emoteDetails = _.findKey(emoteList, o => o.code === emoteCode);
 
     if (emoteDetails !== undefined) {
       resolve(emoteDetails);
@@ -62,10 +56,8 @@ function queryEmoteList(emoteList, emoteCode) {
  * @return {Number} returns image_id that corresponds to a matching emote code
  */
 function emoteChecker(emoteCode) {
-  if (_.isEmpty(cache)) {
-    // query emote list because cache is empty
-    return queryEmoteList(emotes, emoteCode);
-  }
+  // query emote list because cache is empty
+  if (_.isEmpty(cache)) return queryEmoteList(emotes, emoteCode);
 
   if (Promise.reject(queryEmoteList(cache, emoteCode)) === undefined) {
     // check if cache contains emote already
@@ -91,15 +83,13 @@ function returnImage(imageID) {
  * @return {Object} object containing emote metadata and image URLs
  */
 export function matchEmotes(wordList) {
-  if (!loaded) {
-    return false;
-  }
+  if (!loaded) return false;
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const images = [];
 
-    wordList.forEach((emoteCode) => {
-      emoteChecker(emoteCode).then((response) => {
+    wordList.forEach(emoteCode => {
+      emoteChecker(emoteCode).then(response => {
         const imageID = response;
         cache[imageID] = { code: emoteCode };
         const pair = {};
