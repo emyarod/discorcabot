@@ -122,7 +122,7 @@ export function turntable(orcabot, message) {
   const voiceChannel = message.author.voiceChannel;
 
   // check if user is in a voice channel
-  if (voiceChannel === null) {
+  if (!voiceChannel) {
     orcabot.reply(message, 'You must be in a voice channel to use DJ commands!');
     return;
   }
@@ -149,9 +149,9 @@ export function turntable(orcabot, message) {
 
   // check if client.voiceConnection property exists and if user is in voice channel with bot
   const connectedToVoice = orcabot.voiceConnection;
-  const botVoiceChannel = connectedToVoice !== undefined ? connectedToVoice.id : null;
+  const botVoiceChannel = connectedToVoice ? connectedToVoice.id : null;
 
-  if (connectedToVoice !== undefined && botVoiceChannel === message.author.voiceChannel.id) {
+  if (connectedToVoice && botVoiceChannel === message.author.voiceChannel.id) {
     // exit channel
     if (command === 'part') {
       // check if a track is currently playing
