@@ -176,7 +176,7 @@ export function instagram(message) {
         } = userID;
 
         // replace null caption with empty string
-        if (caption == null) caption = '';
+        if (!caption) caption = '';
 
         // check if the media node is a video
         const {
