@@ -42,7 +42,7 @@ function queryEmoteList(emoteList, emoteCode) {
      */
     const emoteDetails = _.findKey(emoteList, o => o.code === emoteCode);
 
-    if (emoteDetails !== undefined) {
+    if (emoteDetails) {
       resolve(emoteDetails);
     } else {
       reject(emoteDetails);
@@ -59,7 +59,7 @@ function emoteChecker(emoteCode) {
   // query emote list because cache is empty
   if (_.isEmpty(cache)) return queryEmoteList(emotes, emoteCode);
 
-  if (Promise.reject(queryEmoteList(cache, emoteCode)) === undefined) {
+  if (!Promise.reject(queryEmoteList(cache, emoteCode))) {
     // check if cache contains emote already
     return queryEmoteList(emotes, emoteCode);
   }
