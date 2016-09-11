@@ -6,9 +6,11 @@ import {
 // import modules
 import * as modules from './modules/_moduleloader.js';
 
+// bot is ready to respond
 orcabot.on('ready', () => console.log('Ready!'));
 
-orcabot.on('message', (message) => {
+// event listener for messages
+orcabot.on('message', message => {
   // disregard bot messages
   if (message.author.bot) return;
 
@@ -21,7 +23,7 @@ orcabot.on('message', (message) => {
       emotes.forEach(element => {
         const [filename] = Object.keys(element);
         const imageURL = element[filename];
-        orcabot.sendFile(message, imageURL, `${filename}.png`, null, (error) => {
+        orcabot.sendFile(message, imageURL, `${filename}.png`, null, error => {
           if (error) {
             orcabot.reply(message, 'There was an error resolving your request!');
           }
@@ -57,91 +59,55 @@ orcabot.on('message', (message) => {
       case !message.content.search(/^(\.tw )/gi):
         // Twitter
         modules.twitter(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       case !message.content.search(/^(\.ig )/gi):
         // Instagram
         modules.instagram(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       case !message.content.search(/^(\.similar )/gi):
         // Last.fm get similar artists
         modules.getSimilarArtists(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       case !message.content.search(/^(\.getinfo )/gi):
         // Last.fm get artist info
         modules.getArtistInfo(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       case !message.content.search(/^(\.addlfm )/gi):
         // Last.fm add lfm username to db
         modules.addlfm(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       case !message.content.search(/^(\.np)/gi):
         // Last.fm now playing .np <self/user/registered handle>
         modules.nowplaying(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       case !message.content.search(/^(\.charts)/gi):
         // Last.fm weekly charts .charts <self/user/registered handle>
         modules.getWeeklyCharts(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       case !message.content.search(/^(\.yt )/gi) && message.content !== '.yt ':
         // YouTube
         modules.searchYouTube(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       case !message.content.search(/^(\.tr )/gi):
         // translator
         modules.textTranslate(message)
-          .then(response => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          .then(response => resolve(response), error => reject(error));
         break;
 
       default:
@@ -150,10 +116,10 @@ orcabot.on('message', (message) => {
     }
   });
 
-  moduleSwitch.then((whalesong) => {
+  moduleSwitch.then(whalesong => {
     if (whalesong.length === 2) {
       const [image, content] = whalesong;
-      orcabot.sendFile(message, image, null, content, (error) => {
+      orcabot.sendFile(message, image, null, content, error => {
         if (error) {
           orcabot.reply(message, 'There was an error resolving your request!');
         }
@@ -163,7 +129,7 @@ orcabot.on('message', (message) => {
     } else {
       orcabot.reply(message, whalesong);
     }
-  }, (error) => {
+  }, error => {
     orcabot.reply(message, error);
   });
 });
