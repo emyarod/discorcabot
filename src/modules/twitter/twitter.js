@@ -17,7 +17,7 @@ export function twitter(message) {
   const user = message.content.replace('.tw ', '');
 
   return new Promise((resolve, reject) => {
-    if (user.length) {
+    if (user.length > 0) {
       // Twitter API request
       t.get('statuses/user_timeline', {
         screen_name: user,
