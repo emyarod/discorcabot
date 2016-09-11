@@ -45,16 +45,16 @@ export function musicSearch(orcabot, message, service, query) {
 
             // format search results in code block
             let resultsList = '```';
-            results.forEach((element, index) => {
-              resultsList += `\n${index + 1}. "${element.title}"`;
-            });
+            results.forEach((element, index) => (
+              resultsList += `\n${index + 1}. "${element.title}"`
+            ));
 
             resultsList += '\n```';
             orcabot.reply(message, `Select from the following search results:\n${resultsList}`);
 
             // prompt user for video choice
-            const getUserSelection = new Promise((fulfilled) => {
-              const validateSelection = (response) => {
+            const getUserSelection = new Promise(fulfilled => {
+              const validateSelection = response => {
                 // check if response author ID matches original search query author ID
                 if (response.author.id === userID) {
                   // check for integer at beginning of user response
@@ -77,13 +77,13 @@ export function musicSearch(orcabot, message, service, query) {
 
             // TODO: document
             // @param: selection{object} contains title and YouTube videoID
-            getUserSelection.then((selection) => {
+            getUserSelection.then(selection => {
               // get video info
               youtube.videos.list({
                 auth: googleAPIKey,
                 part: 'snippet, contentDetails, status, statistics',
                 id: selection.videoID,
-              }, (error) => {
+              }, error => {
                 if (!error) {
                   const url = `https://youtu.be/${selection.videoID}`;
                   resolve(url);
@@ -131,16 +131,16 @@ export function musicSearch(orcabot, message, service, query) {
 
             // format search results in code block
             let resultsList = '```';
-            results.forEach((element, index) => {
-              resultsList += `\n${index + 1}. ${element.artist} - "${element.title}"`;
-            });
+            results.forEach((element, index) => (
+              resultsList += `\n${index + 1}. ${element.artist} - "${element.title}"`
+            ));
 
             resultsList += '\n```';
             orcabot.reply(message, `Select from the following search results:\n${resultsList}`);
 
             // prompt user for video choice
-            const getUserSelection = new Promise((fulfilled) => {
-              const validateSelection = (userResponse) => {
+            const getUserSelection = new Promise(fulfilled => {
+              const validateSelection = userResponse => {
                 // check if response author ID matches original search query author ID
                 if (userResponse.author.id === userID) {
                   // check for integer at beginning of user response
@@ -161,9 +161,7 @@ export function musicSearch(orcabot, message, service, query) {
               orcabot.on('message', validateSelection);
             });
 
-            getUserSelection.then((selection) => {
-              resolve(selection.permalink);
-            });
+            getUserSelection.then(selection => resolve(selection.permalink));
           }
         } else {
           orcabot.reply(message, 'There was an error with your request!');
