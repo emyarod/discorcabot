@@ -124,9 +124,7 @@ export function ytdl(orcabot, message, songURL, queue, platform = null) {
 
   // set options based on service platform
   let options = null;
-  if (platform === 'youtube') {
-    options = ['-f bestaudio'];
-  }
+  if (platform === 'youtube') options = ['-f bestaudio'];
 
   youtubedl.getInfo(songURL, options, (error, info) => {
     if (error) {
@@ -153,9 +151,7 @@ export function ytdl(orcabot, message, songURL, queue, platform = null) {
       }
 
       // announce queue additions
-      const [{
-        playlist_title: playlistTitle,
-      }] = info;
+      const [{ playlist_title: playlistTitle }] = info;
       orcabot.reply(message, `Added playlist \`${playlistTitle}\` to the queue!`);
     }
 
@@ -188,20 +184,14 @@ export function ytImFeelingLucky(orcabot, message, searchTerm) {
           orcabot.reply(message, 'No results found!');
         } else {
           // top search result = searchList.items[0]
-          const {
-            items: [{
-              id: {
-                videoId: videoID,
-              },
-            }],
-          } = searchList;
+          const { items: [{ id: { videoId: videoID } }] } = searchList;
 
           // get video info
           youtube.videos.list({
             auth: googleAPIKey,
             part: 'snippet, contentDetails, status, statistics',
             id: videoID,
-          }, (err) => {
+          }, err => {
             if (!err) {
               const url = `https://youtu.be/${videoID}`;
               resolve(url);
@@ -227,7 +217,7 @@ export function ytImFeelingLucky(orcabot, message, searchTerm) {
  */
 export function attachmentLoader(orcabot, message, queue) {
   // play attached file if no search term
-  if (message.attachments.length > 0) {
+  if (message.attachments.length) {
     // check if attachment exists
     for (let i = 0; i < message.attachments.length; i++) {
       const element = message.attachments[i];
