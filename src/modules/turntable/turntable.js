@@ -234,9 +234,7 @@ export function turntable(orcabot, message) {
         } else {
           soundcloud(orcabot, message, searchResult, 'link', queue);
         }
-      }, error => {
-        orcabot.reply(message, error);
-      });
+      }, error => orcabot.reply(message, error));
     }
 
     // check if there is a track playing or paused
@@ -259,7 +257,7 @@ export function turntable(orcabot, message) {
       if (!command.indexOf('volume')) {
         const [, volumeLevel] = command.split(' ');
 
-        if (volumeLevel > 0 && volumeLevel <= 100) {
+        if (volumeLevel && volumeLevel <= 100) {
           connectedToVoice.setVolume(volumeLevel / 100);
           orcabot.reply(message, `Volume set to ${volumeLevel}%`);
         }
@@ -268,10 +266,7 @@ export function turntable(orcabot, message) {
       // shuffles the queue
       if (command === 'shuffle') {
         const shuffled = _.shuffle(queue);
-        queue.forEach((element, index) => {
-          queue[index] = shuffled[index];
-        }, this);
-
+        queue.forEach((element, index) => (queue[index] = shuffled[index]), this);
         orcabot.reply(message, 'The queue has been shuffled!');
       }
     } else if (connectedToVoice.paused) {
