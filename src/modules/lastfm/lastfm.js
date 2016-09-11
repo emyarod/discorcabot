@@ -31,11 +31,7 @@ export function getSimilarArtists(message) {
         let numSimilarArtists = 0;
 
         // list up to 5 similar artists
-        if ((similarArtists.artist).length < 5) {
-          numSimilarArtists = (similarArtists.artist).length;
-        } else {
-          numSimilarArtists = 5;
-        }
+        numSimilarArtists = (similarArtists.artist).length < 5 ? (similarArtists.artist).length : 5;
 
         const charts = [];
         for (let i = 0; i < numSimilarArtists; i++) {
@@ -75,20 +71,18 @@ export function getArtistInfo(message) {
       }
 
       // strip html, strip whitespace, decode entities, trim
-      let reply = entities.decode(artistInfo.bio.summary);
-      reply = reply.replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim();
+      const reply = entities.decode(artistInfo.bio.summary)
+        .replace(/<(?:.|\n)*?>/gm, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 
       // slice largest image from array of returned images
-      let {
-        image: image,
-      } = artistInfo;
+      let { image: image } = artistInfo;
 
-      [{
-        '#text': image,
-      }] = image.slice(-3, -2);
+      [{ '#text': image }] = image.slice(-3, -2);
 
       // attach image if Last.fm returns an image
-      if (image !== '') {
+      if (image) {
         resolve([image, reply]);
       } else {
         resolve([null, reply]);
@@ -120,7 +114,7 @@ export function addlfm(message) {
 
   return new Promise((resolve, reject) => {
     // get information about a user profile
-    lfm.user.getInfo(lfmUsername, (err) => {
+    lfm.user.getInfo(lfmUsername, err => {
       if (err) {
         reject(`**${lfmUsername}** is not a registered username on Last.fm!`);
         console.warn(`LAST.FM .addlfm -- ${err.message}`);
@@ -138,7 +132,7 @@ export function addlfm(message) {
         };
 
         // write updated data to file
-        fs.writeFile(lfmdbPATH, JSON.stringify(lfmdb, null, 4), (error) => {
+        fs.writeFile(lfmdbPATH, JSON.stringify(lfmdb, null, 4), error => {
           if (error) {
             reject('There was an error writing to the Last.fm database!');
             console.warn(`LAST.FM WRITEFILE -- ${error}`);
@@ -180,58 +174,30 @@ export function nowplaying(message) {
         }
 
         // track name
-        const {
-          track: [{
-            name: trackname,
-          }],
-        } = recentTracks;
+        const { track: [{ name: trackname }] } = recentTracks;
 
         // track image (can be empty string)
-        const {
-          '#text': image,
-        } = recentTracks.track[0].image.pop();
+        const { '#text': image } = recentTracks.track[0].image.pop();
 
         // track artist
-        const {
-          track: [{
-            artist: {
-              name: artist,
-            },
-          }],
-        } = recentTracks;
+        const { track: [{ artist: { name: artist } }] } = recentTracks;
 
         // album
-        const {
-          track: [{
-            album: {
-              '#text': album,
-            },
-          }],
-        } = recentTracks;
+        const { track: [{ album: { '#text': album } }] } = recentTracks;
 
         // currently scrobbling
-        const {
-          track: [{
-            '@attr': nowscrobbling,
-          }],
-        } = recentTracks;
+        const { track: [{ '@attr': nowscrobbling }] } = recentTracks;
 
         // loved track (can be 0 or 1);
-        const {
-          track: [{
-            loved: loved,
-          }],
-        } = recentTracks;
+        const { track: [{ loved: loved }] } = recentTracks;
 
         const url = `http://www.last.fm/user/${username}`;
         let content;
 
         // query lfmdb to see if username is in the database
-        Object.keys(lfmdb).forEach((key) => {
+        Object.keys(lfmdb).forEach(key => {
           const element = lfmdb[key];
-          if (element.discordUsername === username) {
-            username = `<@${key}>`;
-          }
+          if (element.discordUsername === username) username = `<@${key}>`;
         }, this);
 
         // if scrobbling, prepend is listening to, else prepend 'last listened to'
@@ -242,7 +208,7 @@ export function nowplaying(message) {
         }
 
         // adjust output text based on album metadata
-        if (album !== '') {
+        if (album) {
           content += ` \`${trackname}\` by \`${artist}\` from _\`${album}\`_ **|** ${url}`;
         } else {
           content += ` \`${trackname}\` by \`${artist}\` **|** ${url}`;
@@ -256,7 +222,7 @@ export function nowplaying(message) {
         }
 
         // attach image if Last.fm returns an image
-        if (image !== '') {
+        if (image) {
           resolve([image, content]);
         } else {
           resolve([content]);
@@ -273,48 +239,34 @@ export function nowplaying(message) {
       // check if [name] is a mention
       if (lfmUsername.search(/(<[^>]+>)/) === -1) {
         // [name] is not a mention
-        np(lfmUsername).then((response) => {
-          resolve(response);
-        }, (error) => {
-          reject(error);
-        });
+        np(lfmUsername).then(response => resolve(response), error => reject(error));
       } else {
         // [name] is a mention, so [name] === <@discordID>
         [lfmUsername] = lfmUsername.match(/(\d+)/);
 
         // check if [name] is in database
         let found = false;
-        Object.keys(lfmdb).forEach((key) => {
+        Object.keys(lfmdb).forEach(key => {
           const element = lfmdb[key];
           if (key === lfmUsername) {
             lfmUsername = element.lfmUsername;
             found = true;
-            np(lfmUsername).then((response) => {
-              resolve(response);
-            }, (error) => {
-              reject(error);
-            });
+            np(lfmUsername).then(response => resolve(response), error => reject(error));
           }
         }, this);
 
-        if (!found) {
-          reject(`<@${lfmUsername}> is not in my Last.fm database!`);
-        }
+        if (!found) reject(`<@${lfmUsername}> is not in my Last.fm database!`);
       }
     } else if (message.content === '.np') {
       // check if discordID is in database
       let found = false;
       let lfmUsername = message.author.id;
-      Object.keys(lfmdb).forEach((key) => {
+      Object.keys(lfmdb).forEach(key => {
         const element = lfmdb[key];
         if (key === lfmUsername) {
           lfmUsername = element.lfmUsername;
           found = true;
-          np(lfmUsername).then((response) => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          np(lfmUsername).then(response => resolve(response), error => reject(error));
         }
       }, this);
 
@@ -356,11 +308,9 @@ export function getWeeklyCharts(message) {
         let mention = handle;
 
         // query lfmdb to see if handle is in the database
-        Object.keys(lfmdb).forEach((key) => {
+        Object.keys(lfmdb).forEach(key => {
           const element = lfmdb[key];
-          if (element.discordUsername === handle) {
-            mention = `<@${key}>`;
-          }
+          if (element.discordUsername === handle) mention = `<@${key}>`;
         }, this);
 
         let content = `Weekly Last.fm charts for **${mention} |**`;
@@ -393,48 +343,34 @@ export function getWeeklyCharts(message) {
       // check if [name] is a mention
       if (lfmUsername.search(/(<[^>]+>)/) === -1) {
         // [name] is not a mention
-        getCharts(lfmUsername).then((response) => {
-          resolve(response);
-        }, (error) => {
-          reject(error);
-        });
+        getCharts(lfmUsername).then(response => resolve(response), error => reject(error));
       } else {
         // [name] is a mention, so [name] === <@discordID>
         [lfmUsername] = lfmUsername.match(/(\d+)/);
 
         // check if [name] is in database
         let found = false;
-        Object.keys(lfmdb).forEach((key) => {
+        Object.keys(lfmdb).forEach(key => {
           const element = lfmdb[key];
           if (key === lfmUsername) {
             lfmUsername = element.lfmUsername;
             found = true;
-            getCharts(lfmUsername).then((response) => {
-              resolve(response);
-            }, (error) => {
-              reject(error);
-            });
+            getCharts(lfmUsername).then(response => resolve(response), error => reject(error));
           }
         }, this);
 
-        if (!found) {
-          reject(`<@${lfmUsername}> is not in my Last.fm database!`);
-        }
+        if (!found) reject(`<@${lfmUsername}> is not in my Last.fm database!`);
       }
     } else if (message.content === '.charts') {
       // check if discordID is in database
       let found = false;
       let lfmUsername = message.author.id;
-      Object.keys(lfmdb).forEach((key) => {
+      Object.keys(lfmdb).forEach(key => {
         const element = lfmdb[key];
         if (key === lfmUsername) {
           lfmUsername = element.lfmUsername;
           found = true;
-          getCharts(lfmUsername).then((response) => {
-            resolve(response);
-          }, (error) => {
-            reject(error);
-          });
+          getCharts(lfmUsername).then(response => resolve(response), error => reject(error));
         }
       }, this);
 
