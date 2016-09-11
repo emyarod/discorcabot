@@ -60,7 +60,7 @@ export function musicSearch(orcabot, message, service, query) {
                   // check for integer at beginning of user response
                   if (!response.content.search(/^(\d+)/)) {
                     const [choice] = response.content.match(/^(\d+)/);
-                    if (results[choice - 1] !== undefined) {
+                    if (results[choice - 1]) {
                       // return user's video choice
                       orcabot.removeListener('message', validateSelection);
                       fulfilled(results[choice - 1]);
@@ -146,7 +146,7 @@ export function musicSearch(orcabot, message, service, query) {
                   // check for integer at beginning of user response
                   if (!userResponse.content.search(/^(\d+)/)) {
                     const [choice] = userResponse.content.match(/^(\d+)/);
-                    if (results[choice - 1] !== undefined) {
+                    if (results[choice - 1]) {
                       // return user's video choice
                       orcabot.removeListener('message', validateSelection);
                       fulfilled(results[choice - 1]);
