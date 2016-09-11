@@ -17,7 +17,7 @@ export function twitter(message) {
   const user = message.content.replace('.tw ', '');
 
   return new Promise((resolve, reject) => {
-    if (user.length > 0) {
+    if (user.length) {
       // Twitter API request
       t.get('statuses/user_timeline', {
         screen_name: user,
@@ -36,28 +36,16 @@ export function twitter(message) {
           resolve(`**${user}** hasn't tweeted yet!`);
         } else {
           // username
-          const [{
-            user: {
-              name: username,
-            },
-          }] = data;
+          const [{ user: { name: username } }] = data;
 
           // screen name
-          const [{
-            user: {
-              screen_name: screenName,
-            },
-          }] = data;
+          const [{ user: { screen_name: screenName } }] = data;
 
           // tweet body
-          const [{
-            text: tweet,
-          }] = data;
+          const [{ text: tweet }] = data;
 
           // date posted
-          const [{
-            created_at: date,
-          }] = data;
+          const [{ created_at: date }] = data;
 
           // output
           let content = 'Most recent tweet by ';
