@@ -15,7 +15,6 @@ function getEmotes() {
     loaded = false;
     request('https://twitchemotes.com/api_cache/v2/images.json', (error, response, body) => {
       if (!error && response.statusCode === 200) {
-        console.log('Twitch emotes loaded!');
         emotes = JSON.parse(body).images;
         loaded = true;
         resolve(JSON.parse(body).images);
