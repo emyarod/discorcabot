@@ -18,7 +18,7 @@ orcabot.on('message', message => {
   modules.flex(orcabot, message);
 
   const words = message.content.match(/((?:[a-z][a-z0-9_]*))/gi);
-  if (words !== null) {
+  if (words) {
     modules.matchEmotes(words).then(emotes => {
       emotes.forEach(element => {
         const [filename] = Object.keys(element);
