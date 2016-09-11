@@ -4,4 +4,4 @@ import Discord from 'discord.js';
 export const orcabot = new Discord.Client();
 
 // login and authenticate
-orcabot.loginWithToken(keys.discordToken);
+orcabot.login(keys.discordToken);
