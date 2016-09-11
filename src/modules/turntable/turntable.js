@@ -184,7 +184,7 @@ export function turntable(orcabot, message) {
           soundcloud(orcabot, message, songURL, validURL, queue);
         } else if (songURL.search(/youtube\.com/) !== -1) {
           // YouTube
-          ytdl(orcabot, message, songURL, queue, null, 'youtube');
+          ytdl(orcabot, message, songURL, queue, 'youtube');
         } else {
           // youtubedl
           ytdl(orcabot, message, songURL, queue);
