@@ -26,9 +26,7 @@ export function loader(queue, message, streamURL, title, artist = null, platform
  */
 export function player(orcabot, queue) {
   // stop if queue is empty
-  if (!queue.length) {
-    return;
-  }
+  if (!queue.length) return;
 
   // check if a track is already playing
   if (!orcabot.voiceConnection.playing) {
