@@ -6,11 +6,11 @@ import {
 // import modules
 import * as modules from './modules/_moduleloader.js';
 
+orcabot.on('ready', () => console.log('Ready!'));
+
 orcabot.on('message', (message) => {
   // disregard bot messages
-  if (message.author.bot) {
-    return;
-  }
+  if (message.author.bot) return;
 
   // nfz
   modules.flex(orcabot, message);
