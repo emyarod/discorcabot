@@ -28,14 +28,12 @@ export function googlesearch(message) {
 
       if (!response.searchInformation.formattedTotalResults) {
         resolve('No results found!');
-      } else if (response.items && response.items.length > 0) {
+      } else if (response.items && response.items.length) {
         const searchResults = `https://www.google.com/?gws_rd=ssl#q=${query.replace(/ /g, '+')}`;
 
         // shorten search results url
         urlshortener.url.insert({
-          resource: {
-            longUrl: searchResults,
-          },
+          resource: { longUrl: searchResults },
           auth: googleAPIKey,
         }, (err, result) => {
           const entities = new Entities();
@@ -47,11 +45,7 @@ export function googlesearch(message) {
             .replace(/<(?:.|\n)*?>/gm, '')
             .replace(/\s+/g, ' ')
             .trim();
-          const {
-            items: [{
-              link: link,
-            }],
-          } = response;
+          const { items: [{ link: link }] } = response;
 
           let results;
           if (err) {
@@ -60,6 +54,7 @@ export function googlesearch(message) {
           } else {
             results = result.id;
           }
+
           let content = `**\`${title}\`** - ${link}\n`;
           content += `\`\`\`\n${snippet}\n\`\`\`\nmore results: ${results}`;
           resolve(content);
