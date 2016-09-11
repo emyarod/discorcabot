@@ -124,46 +124,22 @@ function speak(languageParams, languageNames, inputText) {
 function detectWrap(languageParams, inputText, detectType) {
   const params = languageParams;
   let content = '';
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     detect(params)
-      .then(response => (
-        response
-      ), (error) => {
-        reject('There was an error with your translation.');
-        console.warn(`TRANSLATOR ${detectType} detect -- ${error}`);
-        console.warn(error);
-      })
-      .then(response => (
-        // converts language codes to language names
-        getLanguageNames(response)
-      ), (error) => {
-        reject('There was an error with your translation.');
-        console.warn(`TRANSLATOR ${detectType} getLanguageNames -- ${error}`);
-        console.warn(error);
-      })
-      .then(languageNames => (
-        // output translation
-        translate(params, languageNames)
-      ), (error) => {
-        reject('There was an error with your translation.');
-        console.warn(`TRANSLATOR ${detectType} translate -- ${error}`);
-        console.warn(error);
-      })
-      .then((response) => {
+      .then(getLanguageNames)
+      .then(languageNames => translate(params, languageNames))
+      .then(response => {
         [content] = response;
         const [, languageNames] = response;
 
         // stream spoken mp3 to uguu.se and provide link
         return speak(params, languageNames, inputText);
       })
-      .then((response) => {
+      .then(response => {
         content += ` -- ${response}`;
         resolve(content);
-      }, (error) => {
-        reject('There was an error with your translation.');
-        console.warn(`TRANSLATOR ${detectType} speak -- ${error}`);
-        console.warn(error);
-      });
+      })
+      .catch(error => console.log(detectType, '\n', error));
   });
 }
 
@@ -214,32 +190,18 @@ export function textTranslate(message) {
       return new Promise((resolve, reject) => {
         let content = '';
         getLanguageNames(params)
-          .then(response => (
-            response
-          ), (error) => {
-            reject('There was an error with your translation.');
-            console.warn(`TRANSLATOR code:code getLanguageNames -- ${error}`);
-            console.warn(error);
-          })
-          .then(languageNames => (
-            // output translation in English
-            translate(params, languageNames, true)
-          ), (error) => {
-            reject('There was an error with your translation.');
-            console.warn(`TRANSLATOR code:code translate -- ${error}`);
-            console.warn(error);
-          })
-          .then((response) => {
+          .then(languageNames => translate(params, languageNames, true))
+          .then(response => {
             [content] = response;
             const [, languageNames, translatedText] = response;
 
             // stream spoken mp3 to uguu.se and provide link
             return speak(params, languageNames, translatedText);
           })
-          .then((response) => {
+          .then(response => {
             content += ` -- ${response}`;
             resolve(content);
-          }, (error) => {
+          }, error => {
             reject('There was an error with your translation.');
             console.warn(`TRANSLATOR code:code speak -- ${error}`);
             console.warn(error);
