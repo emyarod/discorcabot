@@ -9,7 +9,7 @@ import cheerio from 'cheerio';
  */
 function getMediaURL(isVideo, userID) {
   // use promise for async request in case media node is a video
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     // scrape video link if the media node is a video
     if (isVideo) {
       const {
@@ -90,9 +90,7 @@ export function instagram(message) {
     request(`https://www.instagram.com/${user}`, (e, res, html) => {
       if (!e && res.statusCode === 200) {
         // validate user
-        if (user === '') {
-          return;
-        }
+        if (!user) return;
 
         // scrape Instagram profile page
         const $ = cheerio.load(html, {
@@ -178,9 +176,7 @@ export function instagram(message) {
         } = userID;
 
         // replace null caption with empty string
-        if (caption == null) {
-          caption = '';
-        }
+        if (caption == null) caption = '';
 
         // check if the media node is a video
         const {
@@ -200,7 +196,7 @@ export function instagram(message) {
         } = userID;
 
         // get link to media then reply in chat
-        getMediaURL(isVideo, userID).then((mediaURL) => {
+        getMediaURL(isVideo, userID).then(mediaURL => {
           if (isVideo) {
             // link video in chat
             let content = 'Most recent Instagram post by ';
