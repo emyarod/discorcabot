@@ -95,9 +95,7 @@ export function matchEmotes(wordList) {
         const pair = {};
         pair[emoteCode] = returnImage(response);
         images.push(pair);
-      }).then(() => {
-        resolve(images);
-      });
+      }).then(() => resolve(images));
     }, this);
   });
 }
