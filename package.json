@@ -2,51 +2,64 @@
   "name": "discorcabot",
   "version": "1.0.0",
   "description": "node.js Discord bot",
-  "main": "./dist/orcatail.js",
-  "dependencies": {
-    "cheerio": "^0.20.0",
-    "discord.js": "github:hydrabolt/discord.js#indev-old",
-    "googleapis": "^9.0.0",
-    "html-entities": "^1.2.0",
-    "lastfmapi": "^0.1.1",
-    "lodash": "^4.13.1",
-    "moment": "^2.13.0",
-    "mstranslator": "^2.0.8",
-    "request": "^2.72.0",
-    "twit": "^2.2.4",
-    "url-regex": "^3.2.0",
-    "youtube-dl": "^1.11.1"
-  },
-  "devDependencies": {
-    "babel-core": "^6.9.1",
-    "babel-loader": "^6.2.4",
-    "babel-preset-es2015": "^6.9.0",
-    "del": "^2.2.0",
-    "eslint": "^3.1.1",
-    "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-import": "^1.10.2",
-    "eslint-plugin-jsx-a11y": "^2.0.1",
-    "eslint-plugin-react": "^5.2.2",
-    "gulp": "^3.9.1",
-    "webpack-node-externals": "^1.2.0",
-    "webpack-stream": "^3.2.0"
+  "main": "./dist/discorcabot.js",
+  "author": "emyarod",
+  "license": "MIT",
+  "keywords": [
+    "node.js",
+    "discord",
+    "bot"
+  ],
+  "bugs": {
+    "url": "https://github.com/emyarod/discorcabot/issues"
   },
   "scripts": {
+    "lint": "tslint --project tsconfig.json -c tslint.json 'src/**/*.ts'",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean && mkdir dist",
+    "build": "webpack --mode=production --config webpack.config.babel.js",
+    "dev": "webpack --mode=development --config webpack.config.babel.js && node dist/discorcabot",
+    "start": "nodemon --watch src -e ts --verbose --exec npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/emyarod/discorcabot.git"
   },
-  "keywords": [
-    "node.js",
-    "discord",
-    "bot"
-  ],
-  "author": "emyarod",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/emyarod/discorcabot/issues"
+  "homepage": "https://github.com/emyarod/discorcabot#readme",
+  "dependencies": {
+    "bufferutil": "^4.0.0",
+    "discord.js": "^11.3.2",
+    "erlpack": "github:hammerandchisel/erlpack",
+    "ffmpeg-binaries": "^4.0.0",
+    "libsodium-wrappers": "^0.7.3",
+    "node-fetch": "^2.1.2",
+    "node-opus": "^0.3.0",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
+    "uws": "^10.148.1"
   },
-  "homepage": "https://github.com/emyarod/discorcabot#readme"
+  "devDependencies": {
+    "@types/node": "^10.5.2",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "jest": "^23.3.0",
+    "nodemon": "^1.17.5",
+    "prettier": "^1.13.7",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^23.0.0",
+    "ts-loader": "^4.4.2",
+    "tslint": "^5.10.0",
+    "tslint-config-prettier": "^1.13.0",
+    "typescript": "^2.9.2",
+    "webpack": "^4.15.1",
+    "webpack-cli": "^3.0.8",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  }
 }
