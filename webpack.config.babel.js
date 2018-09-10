@@ -11,6 +11,9 @@ const config = {
   resolve: {
     extensions: ['.js', '.ts'],
   },
+  node: {
+    __dirname: true,
+  },
   module: {
     rules: [
       {
