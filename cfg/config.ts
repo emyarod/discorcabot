@@ -6,4 +6,5 @@ const orcabot = new Discord.Client();
 // login and authenticate
 orcabot.login(keys.discordToken);
 
+export const { prefix } = keys;
 export default orcabot;

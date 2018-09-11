@@ -1,4 +1,6 @@
-module.exports = {
+export default {
+  prefix: '.',
+
   // Discord
   discordToken: 'your-discordToken-here',
   discordClientID: 'your-discordClientID-here',
