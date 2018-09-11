@@ -32,8 +32,10 @@ orcabot.on('message', (message: Message) => {
     return;
   }
 
-  const args = message.content.slice(prefix.length).split(/ +/);
-  const commandName = args.shift()!.toLowerCase();
+  const [inputCommand, ...args] = message.content
+    .slice(prefix.length)
+    .split(/ +/);
+  const commandName = inputCommand.toLowerCase();
   const command =
     commands.get(commandName) ||
     commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
