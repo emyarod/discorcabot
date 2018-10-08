@@ -35,8 +35,6 @@
     "libsodium-wrappers": "^0.7.3",
     "node-fetch": "^2.2.0",
     "node-opus": "^0.3.0",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.2",
     "uws": "^10.148.2"
   },
   "devDependencies": {
