@@ -1,10 +1,10 @@
 import * as Discord from 'discord.js';
-import keys from './opendoors';
+import { Orcabot } from '../src/types';
+import { discordToken } from './opendoors';
 
-const orcabot = new Discord.Client();
+const orcabot: Orcabot = new Discord.Client();
 
 // login and authenticate
-orcabot.login(keys.discordToken);
+orcabot.login(discordToken);
 
-export const { prefix } = keys;
 export default orcabot;
