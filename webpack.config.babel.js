@@ -1,7 +1,7 @@
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
 
-const config = {
+export default {
   entry: './src/orcatail.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -25,5 +25,3 @@ const config = {
   },
   externals: [nodeExternals()],
 };
-
-export default config;
