@@ -1,4 +1,5 @@
 # discdiscorcabot
+
 node.js discord bot :whale: :whale2:
 
 ## Setup & Installation
@@ -8,6 +9,7 @@ node.js discord bot :whale: :whale2:
 ### Clone discorcabot
 
 ### Install dependencies
+
 ```
 cd discorcabot
 npm install
@@ -25,6 +27,7 @@ Rename `lastfmdb.example.json` to `lastfmdb.json`. For information on how to sto
 ### Running the bot
 
 #### Linux
+
 ```
 bash startbot.sh
 ```
