@@ -58,7 +58,7 @@ module.exports = {
   globals: {
     'ts-jest': {
       babelConfig: {
-        presets: ['env'],
+        presets: ['@babel/preset-env'],
       },
       tsConfigFile: 'tsconfig.json',
     },
