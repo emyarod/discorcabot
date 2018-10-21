@@ -13,6 +13,11 @@ interface Command {
   execute: (message: Message, args?: object) => void;
 }
 
+const cooldowns: Collection<
+  string,
+  Collection<string, number>
+> = new Collection();
+
 orcabot.on('ready', () => {
   console.log('Ready!');
 });
@@ -50,6 +55,35 @@ orcabot.on('message', (message: Message) => {
 
   if (command.args && !args.length) {
     return message.reply(`you didn't provide any arguments!`);
+  }
+
+  if (!cooldowns.has(command.name)) {
+    cooldowns.set(command.name, new Collection());
+  }
+
+  const now = Date.now();
+  const timestamps: Collection<string, number> =
+    cooldowns.get(command.name) || new Collection();
+  const cooldownAmount = (command.cooldown || 3) * 1000;
+
+  if (!timestamps.has(message.author.id)) {
+    timestamps.set(message.author.id, now);
+    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+  } else {
+    const expirationTime =
+      (timestamps.get(message.author.id) || 0) + cooldownAmount;
+    if (now < expirationTime) {
+      const timeLeft = (expirationTime - now) / 1000;
+      const timeLeftFixed = timeLeft.toFixed(1);
+      return message.reply(
+        `please wait ${timeLeftFixed} more ${
+          timeLeftFixed === '1' ? 'second' : 'seconds'
+        } before reusing the \`${command.name}\` command.`
+      );
+    }
+
+    timestamps.set(message.author.id, now);
+    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
   }
 
   try {
