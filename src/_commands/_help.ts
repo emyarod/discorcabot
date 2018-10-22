@@ -6,7 +6,7 @@ export default {
   name: 'help',
   description: 'List all of my commands or info about a specific command.',
   aliases: ['commands'],
-  usage: '[command name]',
+  usage: '<command>',
   cooldown: 5,
   execute(
     message: Message & { client: { commands: Collection<string, Command> } },
@@ -29,6 +29,7 @@ export default {
           if (message.channel.type === 'dm') {
             return;
           }
+          message.reply(`I've sent you a DM with all of my commands!`);
         })
         .catch(error => {
           console.error(
@@ -60,7 +61,7 @@ export default {
       helpText.push(`**Description:** ${command.description}`);
     }
     if (command.usage) {
-      helpText.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
+      helpText.push(`**Usage:** \`${prefix}${command.name} ${command.usage}\``);
     }
 
     helpText.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
