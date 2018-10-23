@@ -32,6 +32,7 @@
     "discord.js": "^11.4.2",
     "erlpack": "github:hammerandchisel/erlpack",
     "ffmpeg-binaries": "^4.0.0",
+    "googleapis": "^34.0.0",
     "libsodium-wrappers": "^0.7.3",
     "node-fetch": "^2.2.0",
     "node-opus": "^0.3.0",
