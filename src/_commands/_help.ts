@@ -55,7 +55,9 @@ export default {
     helpText.push(`**Name:** ${command.name}`);
 
     if (command.aliases) {
-      helpText.push(`**Aliases:** ${command.aliases.join(', ')}`);
+      helpText.push(
+        `**Aliases:** ${command.aliases.map(c => `\`${c}\``).join(', ')}`
+      );
     }
     if (command.description) {
       helpText.push(`**Description:** ${command.description}`);
