@@ -2,7 +2,7 @@ import { Message, RichEmbed } from 'discord.js';
 import { customsearch_v1, google } from 'googleapis';
 import { googleAPIKey, googleCX } from '../../cfg/opendoors';
 
-export const search = async ({
+const search = async ({
   options,
   query,
   message,
