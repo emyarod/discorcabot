@@ -21,7 +21,7 @@ const search = async ({
     '+'
   )}`;
   const topResult = response.items[0];
-  const exampleEmbed = new RichEmbed()
+  const googleSearchEmbed = new RichEmbed()
     .setColor('#0099ff')
     .setTitle(topResult.title)
     .setURL(topResult.formattedUrl || '')
@@ -39,7 +39,7 @@ const search = async ({
       'https://www.google.com/favicon.ico'
     )
     .setTimestamp();
-  return message.channel.send(exampleEmbed);
+  return message.channel.send(googleSearchEmbed);
 };
 
 export default {
