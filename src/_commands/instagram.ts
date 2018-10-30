@@ -108,7 +108,10 @@ export default {
               .setImage(imageURL)
               .addField('Likes ♥', likes, true)
               .addField('Comments 💬', comments, true)
-              .setFooter(`Posted ${new Date(timestamp * 1000)}`);
+              .setFooter(
+                `Posted ${new Date(timestamp * 1000)}`,
+                'https://www.instagram.com/favicon.ico'
+              );
 
       return message.channel.send(content, media);
     } catch (error) {
