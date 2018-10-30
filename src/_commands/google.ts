@@ -24,7 +24,7 @@ const search = async ({
   const googleSearchEmbed = new RichEmbed()
     .setColor('#0099ff')
     .setTitle(topResult.title)
-    .setURL(topResult.formattedUrl || '')
+    .setURL(topResult.link || '')
     .setAuthor(
       `Google Search - ${query}`,
       'https://www.google.com/favicon.ico',
