@@ -13,7 +13,7 @@ const search = async ({
 }) => {
   const customsearch = google.customsearch('v1');
   const { data: response } = await customsearch.cse.list(options);
-  if (!response.items) {
+  if (!response.items || !response.searchInformation) {
     return message.reply('No search results found!');
   }
   const searchResults = `https://www.google.com/search?q=${query.replace(
