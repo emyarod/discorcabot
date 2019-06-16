@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import { Message, RichEmbed } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import fetch, { Response } from 'node-fetch';
 
 const fetchProfileData = (username: string) =>
@@ -94,7 +94,7 @@ export default {
           ? {
               files: [await scrapeVideoPage(shortcode)],
             }
-          : new RichEmbed()
+          : new MessageEmbed()
               .setColor('#e1306c')
               .setAuthor(
                 `${fullName} (@${username})`,

@@ -1,4 +1,4 @@
-import { Message, RichEmbed } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { customsearch_v1, google } from 'googleapis';
 import { googleAPIKey, googleCX } from '../../cfg/opendoors';
 
@@ -13,15 +13,16 @@ const search = async ({
 }) => {
   const customsearch = google.customsearch('v1');
   const { data: response } = await customsearch.cse.list(options);
-  if (!response.items || !response.searchInformation) {
+  const { items, searchInformation } = response;
+  if (!items || !searchInformation) {
     return message.reply('No search results found!');
   }
   const searchResults = `https://www.google.com/search?q=${query.replace(
     / /g,
     '+'
   )}`;
-  const topResult = response.items[0];
-  const googleSearchEmbed = new RichEmbed()
+  const topResult = items[0];
+  const googleSearchEmbed = new MessageEmbed()
     .setColor('#0099ff')
     .setTitle(topResult.title)
     .setURL(topResult.link || '')
@@ -33,9 +34,7 @@ const search = async ({
     .setDescription(topResult.snippet)
     .addField('View all results', searchResults)
     .setFooter(
-      `About ${response.searchInformation.formattedTotalResults} results (${
-        response.searchInformation.formattedSearchTime
-      } seconds)`,
+      `About ${searchInformation.formattedTotalResults} results (${searchInformation.formattedSearchTime} seconds)`,
       'https://www.google.com/favicon.ico'
     )
     .setTimestamp();
