@@ -25,10 +25,7 @@ const fetchProfileData = (username: string) =>
         .filter(
           (i, e) =>
             $(e).get(0).children[0] &&
-            $(e)
-              .get(0)
-              .children[0].data!.trim()
-              .includes(username)
+            $(e).get(0).children[0].data!.trim().includes(username)
         )
         .get(0)
         .children[0].data!.slice(21, -1);
@@ -88,7 +85,13 @@ export default {
         taken_at_timestamp: timestamp,
       } = mostRecentPost;
       const caption = edge_media_to_caption.edges[0].node.text || '';
-      const content = `Latest Instagram post by **${fullName} (@${username})**`;
+      // Discord embed titles can only be 256 characters long
+      const content = `Latest Instagram post by **${fullName} (@${username})**${
+        ((caption.length > 256 || postType === 'GraphVideo') &&
+          `\n\n${caption}`) ||
+        ''
+      }`;
+      console.log(caption);
       const media =
         postType === 'GraphVideo'
           ? {
@@ -102,7 +105,7 @@ export default {
                 `https://www.instagram.com/${username}`
               )
               .setURL(`https://www.instagram.com/p/${shortcode}`)
-              .setTitle(caption)
+              .setTitle(caption.length <= 256 && caption)
               .setThumbnail(profilePic)
               .setDescription(postType === 'GraphSidecar' ? 'Album' : '')
               .setImage(imageURL)
