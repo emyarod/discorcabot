@@ -7,12 +7,19 @@ export default {
   execute(message: Message) {
     if (!message.mentions.users.size) {
       return message.channel.send(
-        `Your avatar: ${message.author.displayAvatarURL}`
+        `Your avatar: ${message.author.displayAvatarURL({
+          dynamic: true,
+          size: 2048,
+        })}`
       );
     }
 
     const avatarList = message.mentions.users.map(
-      user => `${user.username}'s avatar: ${user.displayAvatarURL}`
+      user =>
+        `${user.username}'s avatar: ${user.displayAvatarURL({
+          dynamic: true,
+          size: 2048,
+        })}`
     );
     return message.channel.send(avatarList);
   },
