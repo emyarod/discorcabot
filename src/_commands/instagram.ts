@@ -107,7 +107,7 @@ export default {
                 `https://www.instagram.com/${username}`
               )
               .setURL(`https://www.instagram.com/p/${shortcode}`)
-              .setTitle(caption.length <= 256 && caption)
+              .setTitle((caption.length <= 256 && caption) || '')
               .setThumbnail(profilePic)
               .setDescription(postType === 'GraphSidecar' ? 'Album' : '')
               .setImage(imageURL)
