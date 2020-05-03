@@ -13,6 +13,12 @@ if (!msTranslatorSubscriptionKey) {
   );
 }
 
+if (!defaultTranslationOutputLanguage) {
+  throw new Error(
+    'Environment variable for your default Translator output language is not set!'
+  );
+}
+
 function fetchLanguages() {
   return fetch(
     'https://api.cognitive.microsofttranslator.com/languages?api-version=3.0&scope=translation'
