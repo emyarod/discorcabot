@@ -21,6 +21,12 @@ function fetchLanguages() {
     .then(({ translation }) => translation);
 }
 
+// TODO: replace with top level await when it is released
+let languages = {};
+(async () => {
+  languages = await fetchLanguages();
+})();
+
 function translate({
   from,
   to,
