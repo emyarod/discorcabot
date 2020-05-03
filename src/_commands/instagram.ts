@@ -23,7 +23,7 @@ function fetchProfileData(username: string) {
        */
       const profileData = $('script[type="text/javascript"]')
         .filter(
-          (i, e) =>
+          (_, e) =>
             $(e).get(0).children[0] &&
             $(e).get(0).children[0].data!.trim().includes(username)
         )
