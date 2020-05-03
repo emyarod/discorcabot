@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, MessageEmbed, Util } from 'discord.js';
 import fetch, { Response } from 'node-fetch';
 
 function fetchProfileData(username: string) {
@@ -91,7 +91,7 @@ export default {
       // Discord embed titles can only be 256 characters long
       const content = `Latest Instagram post by **${fullName} (@${username})**${
         ((caption.length > 256 || postType === 'GraphVideo') &&
-          `\n\n${caption}`) ||
+          `\n\`\`\`\n${Util.escapeMarkdown(caption)}\n\`\`\``) ||
         ''
       }`;
       const media =
