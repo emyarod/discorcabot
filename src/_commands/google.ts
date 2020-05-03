@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { customsearch_v1, google } from 'googleapis';
 import { googleAPIKey, googleCX } from '../../cfg/opendoors';
 
-const search = async ({
+async function search({
   options,
   query,
   message,
@@ -10,7 +10,7 @@ const search = async ({
   options: customsearch_v1.Params$Resource$Cse$List;
   query: string;
   message: Message;
-}) => {
+}) {
   const customsearch = google.customsearch('v1');
   const { data: response } = await customsearch.cse.list(options);
   const { items, searchInformation } = response;
@@ -39,7 +39,7 @@ const search = async ({
     )
     .setTimestamp();
   return message.channel.send(googleSearchEmbed);
-};
+}
 
 export default {
   name: 'google',

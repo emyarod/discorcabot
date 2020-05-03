@@ -2,8 +2,8 @@ import * as cheerio from 'cheerio';
 import { Message, MessageEmbed } from 'discord.js';
 import fetch, { Response } from 'node-fetch';
 
-const fetchProfileData = (username: string) =>
-  fetch(`https://www.instagram.com/${username}`)
+function fetchProfileData(username: string) {
+  return fetch(`https://www.instagram.com/${username}`)
     .then((response: Response) => {
       if (!response.ok) {
         throw new Error(response.statusText);
@@ -31,8 +31,10 @@ const fetchProfileData = (username: string) =>
         .children[0].data!.slice(21, -1);
       return JSON.parse(profileData).entry_data.ProfilePage[0].graphql.user;
     });
-const scrapeVideoPage = async (shortcode: string) =>
-  fetch(`https://www.instagram.com/p/${shortcode}`)
+}
+
+function scrapeVideoPage(shortcode: string) {
+  return fetch(`https://www.instagram.com/p/${shortcode}`)
     .then((response: Response) => {
       if (!response.ok) {
         throw new Error(response.statusText);
@@ -48,6 +50,7 @@ const scrapeVideoPage = async (shortcode: string) =>
       const videoLink = $('meta[property="og:video"]').attr('content');
       return videoLink;
     });
+}
 
 export default {
   name: 'instagram',

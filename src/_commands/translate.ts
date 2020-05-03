@@ -13,15 +13,15 @@ if (!msTranslatorSubscriptionKey) {
   );
 }
 
-const fetchLanguages = async () =>
-  fetch(
+function fetchLanguages() {
+  return fetch(
     'https://api.cognitive.microsofttranslator.com/languages?api-version=3.0&scope=translation'
   )
     .then(res => res.json())
     .then(({ translation }) => translation);
+}
 
-let languages = fetchLanguages();
-const translate = ({
+function translate({
   from,
   to,
   text,
@@ -29,7 +29,7 @@ const translate = ({
   from?: string;
   to: string;
   text: string;
-}) => {
+}) {
   const qs = new URLSearchParams({
     'api-version': '3.0',
     ...(from && { from }), // optionally spread input language code
@@ -50,7 +50,7 @@ const translate = ({
     .then(res => res.json())
     .then(data => data[0])
     .catch(console.error);
-};
+}
 
 export default {
   name: 'translate',
