@@ -94,7 +94,6 @@ export default {
           `\n\n${caption}`) ||
         ''
       }`;
-      console.log(caption);
       const media =
         postType === 'GraphVideo'
           ? {
