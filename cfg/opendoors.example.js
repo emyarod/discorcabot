@@ -19,8 +19,8 @@ export const googleCX = 'your-googleCX-here';
 export const googleAPIKey = 'your-googleAPIKey-here';
 
 // Microsoft Translator
-export const clientID = 'your-clientID-here';
 export const msTranslatorKey = 'your-msTranslatorKey-here';
+export const defaultTranslationOutputLanguage = 'en';
 
 // SoundCloud
 export const scClientID = 'your-scClientID-here';
