@@ -172,7 +172,7 @@ export default {
   description: `Translate text from one language to another`,
   aliases: ['tr'],
   usage: '[<input language>:<output language>] <text to translate>',
-  cooldown: 3,
+  cooldown: 5,
   execute: async (message: Message, args: string[]) => {
     if (!languages[defaultTranslationOutputLanguage]) {
       languages = await fetchLanguages();
