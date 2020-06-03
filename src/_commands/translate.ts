@@ -19,7 +19,7 @@ if (!defaultTranslationOutputLanguage) {
   );
 }
 
-function fetchLanguages() {
+async function fetchLanguages() {
   return fetch(
     'https://api.cognitive.microsofttranslator.com/languages?api-version=3.0&scope=translation'
   )
