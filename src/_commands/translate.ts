@@ -208,7 +208,7 @@ export default {
       }
       const translatorOutput = await translate({
         from: !to || from === 'auto' ? null : from,
-        to: !to ? defaultTranslationOutputLanguage : to,
+        to: to || defaultTranslationOutputLanguage,
         text: args.join(' '),
       });
       const translatedText = translatorOutput.translations[0].text;
