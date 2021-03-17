@@ -11,4 +11,7 @@ export interface Command {
   execute: (message: Message, args?: object) => void;
 }
 
-export type Orcabot = Client & { commands?: Collection<string, Command> };
+export type Orcabot = Client & {
+  commands?: Collection<string, Command>;
+  translateLanguages?: object;
+};

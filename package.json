@@ -37,6 +37,7 @@
     "googleapis": "^48.0.0",
     "libsodium-wrappers": "^0.7.6",
     "node-fetch": "^2.6.0",
+    "twitter-lite": "^0.13.0",
     "uuid": "^7.0.3",
     "xmlbuilder2": "^2.1.2",
     "zlib-sync": "^0.1.6"
