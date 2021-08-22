@@ -1,3 +1,5 @@
+.DS_Store
+
 # Logs
 logs
 *.log
@@ -58,8 +60,8 @@ typings/
 .env
 
 # Secrets
-src/cfg/lastfmdb.json
-src/cfg/opendoors.js
+cfg/lastfmdb.json
+cfg/opendoors.js
 src/modules/flex.js
 
 # Build directory
