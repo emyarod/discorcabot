@@ -14,7 +14,8 @@
     "url": "https://github.com/emyarod/discorcabot/issues"
   },
   "scripts": {
-    "lint": "tslint --project tsconfig.json -c tslint.json 'src/**/*.ts'",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "yarn run lint --fix",
     "clean": "rimraf dist",
     "prebuild": "npm run clean && mkdir dist",
     "build": "webpack --mode=production --config webpack.config.babel.js",
@@ -45,32 +46,19 @@
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
-    "@babel/register": "^7.15.3",
     "@types/cheerio": "^0.22.30",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.7.1",
     "@types/node-fetch": "^2.5.12",
     "@types/uuid": "^8.3.1",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^8.2.2",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/parser": "^4.29.2",
+    "eslint": "^7.32.0",
+    "eslint-plugin-import": "^2.24.1",
     "jest": "^27.0.6",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
-    "ts-jest": "^27.0.5",
-    "ts-loader": "^9.2.5",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^4.3.5",
-    "webpack": "^5.51.1",
-    "webpack-cli": "^4.8.0",
-    "webpack-node-externals": "^3.0.0"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env"
-    ]
+    "typescript": "^4.3.5"
   }
 }
