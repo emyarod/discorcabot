@@ -14,8 +14,10 @@
     "url": "https://github.com/emyarod/discorcabot/issues"
   },
   "scripts": {
+    "format": "prettier --write 'src/**/*.{json,md}'",
     "lint": "eslint src --ext .ts",
     "lint:fix": "yarn run lint --fix",
+    "postinstall": "husky install",
     "clean": "rimraf dist",
     "prebuild": "npm run clean && mkdir dist",
     "build": "webpack --mode=production --config webpack.config.babel.js",
@@ -55,10 +57,19 @@
     "@typescript-eslint/parser": "^4.29.2",
     "eslint": "^7.32.0",
     "eslint-plugin-import": "^2.24.1",
+    "husky": ">=6",
     "jest": "^27.0.6",
+    "lint-staged": ">=10",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
     "typescript": "^4.3.5"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --cache --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": "prettier --write"
   }
 }
