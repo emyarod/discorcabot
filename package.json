@@ -23,7 +23,7 @@
     "prebuild": "yarn clean",
     "build": "node esbuild.config.js",
     "prestart": "yarn build",
-    "start": "nodemon --watch src -e ts node dist/discorcabot.js",
+    "start": "nodemon --watch src -e ts dist/discorcabot.js",
     "dev": "BUILD_MODE=dev yarn start --verbose",
     "test": "jest"
   },
