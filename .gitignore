@@ -60,8 +60,8 @@ typings/
 .env
 
 # Secrets
-cfg/lastfmdb.json
-cfg/opendoors.js
+src/cfg/lastfmdb.json
+src/cfg/opendoors.js
 src/modules/flex.js
 
 # Build directory
