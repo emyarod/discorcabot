@@ -5,6 +5,9 @@
   "main": "./dist/discorcabot.js",
   "author": "emyarod",
   "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  },
   "keywords": [
     "node.js",
     "discord",
